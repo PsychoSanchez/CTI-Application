@@ -1,0 +1,27 @@
+﻿<Window x:Class="VirtualServer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VirtualServer"
+        mc:Ignorable="d"
+        Title="B-CTI Virtual Server" Height="350" Width="525" Background="Black" BorderBrush="#FF1D1D1D">
+    <Grid>
+        <Button x:Name="StartServer" Content="Начать симуляцию" HorizontalAlignment="Left" Margin="373,231,0,0" VerticalAlignment="Top" Width="134" Click="StartServer_Click" Background="White" Foreground="Black"/>
+        <Label x:Name="MessageInfoLabel" Content="#SendMessageInfo" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="207" Margin="10,45,0,0" VerticalAlignment="Top" Width="176" Foreground="White"/>
+        <TextBox x:Name="PortTextBox" HorizontalAlignment="Left" Height="22" Margin="461,203,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="46" RenderTransformOrigin="0.333,0.217" Text="8001"/>
+        <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" Margin="373,199,0,0" VerticalAlignment="Top" Width="55" Foreground="White"/>
+        <Button x:Name="ContinueButton" Content="Skip Action" HorizontalAlignment="Left" Margin="373,174,0,0" VerticalAlignment="Top" Width="134" Background="White" Click="ContinueButton_Click"/>
+        <Label x:Name="MessageInfoRecieved" Content="#SendMessageInfo" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="207" Margin="191,45,0,0" VerticalAlignment="Top" Width="177" Foreground="White"/>
+        <Label x:Name="label" Content="Ожидаемое сообщение" HorizontalAlignment="Left" Height="31" Margin="10,9,0,0" VerticalAlignment="Top" Width="176" Foreground="White" HorizontalContentAlignment="Center"/>
+        <Label x:Name="label_Copy" Content="Полученное сообщение" HorizontalAlignment="Left" Height="31" Margin="192,9,0,0" VerticalAlignment="Top" Width="176" Foreground="White" HorizontalContentAlignment="Center"/>
+        <Button x:Name="OpenFileButton" Content="..." HorizontalAlignment="Left" Margin="473,45,0,0" VerticalAlignment="Top" Width="34" Height="20" Click="OpenFileButton_Click" Background="White"/>
+        <Label x:Name="FilePathlabel" Content="Файл симуляции" HorizontalAlignment="Left" Margin="373,9,0,0" VerticalAlignment="Top" Width="134" Foreground="White" Height="25"/>
+        <ProgressBar x:Name="Progress" HorizontalAlignment="Left" Height="20" Margin="373,45,0,0" VerticalAlignment="Top" Width="95" Background="White"/>
+        <DatePicker x:Name="StartDate" HorizontalAlignment="Left" Margin="481,68,0,0" VerticalAlignment="Top" Width="26" SelectedDateFormat="Short" IsTodayHighlighted="False" Padding="0,2,2,2" Height="21"/>
+        <DatePicker x:Name="EndDate" HorizontalAlignment="Left" Margin="481,91,0,0" VerticalAlignment="Top" Width="26" SelectedDateFormat="Short" Padding="0,2,2,2" RenderTransformOrigin="0.541,0.908" Height="21"/>
+        <Label x:Name="label1" Content="Готово" HorizontalAlignment="Left" Margin="373,42,0,0" VerticalAlignment="Top" Width="95" Foreground="White"/>
+        <TextBox x:Name="StartTime" HorizontalAlignment="Left" Height="21" Margin="373,68,0,0" TextWrapping="NoWrap"  Text="Время начала" VerticalAlignment="Top" Width="103" TextChanged="StartTime_TextChanged"/>
+        <TextBox x:Name="EndTime" HorizontalAlignment="Left" Height="21" Margin="373,91,0,0" TextWrapping="NoWrap" Text="Время конца" VerticalAlignment="Top" Width="103"/>
+    </Grid>
+</Window>

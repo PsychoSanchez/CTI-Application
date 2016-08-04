@@ -1,0 +1,697 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5DC0D53C-3AE6-44D0-97D3-FA7C8F8463D4}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BCTI</RootNamespace>
+    <AssemblyName>B-CTI</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app_icon_converted.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>BCTI.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EPPlus, Version=4.0.5.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.0.5\lib\net20\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="About.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="About.Designer.cs">
+      <DependentUpon>About.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddToBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddToBook.Designer.cs">
+      <DependentUpon>AddToBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\BPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomControls\BPatternRow.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\BPatternRow.designer.cs">
+      <DependentUpon>BPatternRow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\ApacheFileDownloader.cs" />
+    <Compile Include="BeforeSplash.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BeforeSplash.Designer.cs">
+      <DependentUpon>BeforeSplash.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BLFPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BLFPanel.Designer.cs">
+      <DependentUpon>BLFPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CallManager.cs" />
+    <Compile Include="Helpers\ClipboardHelper.cs" />
+    <Compile Include="CustomControls\BTableLayotPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomControls\Card.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\Card.Designer.cs">
+      <DependentUpon>Card.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\contactChosen.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\contactChosen.Designer.cs">
+      <DependentUpon>contactChosen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\ContactRow.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ContactRow.Designer.cs">
+      <DependentUpon>ContactRow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Contacts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Contacts.Designer.cs">
+      <DependentUpon>Contacts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ContactsBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ContactsBook.Designer.cs">
+      <DependentUpon>ContactsBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\HiddenSplash.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\HiddenSplash.Designer.cs">
+      <DependentUpon>HiddenSplash.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Editor.cs" />
+    <Compile Include="Helpers\Exstensions.cs" />
+    <Compile Include="Helpers\Localizator.cs" />
+    <Compile Include="Helpers\RightsChecker.cs" />
+    <Compile Include="Helpers\SendMail.cs" />
+    <Compile Include="Settings\ApplicationCommonSettings.cs" />
+    <Compile Include="Settings\HotkeySettings.cs" />
+    <Compile Include="Settings\IntegrationSettings.cs" />
+    <Compile Include="Settings\InterfaceSettings.cs" />
+    <Compile Include="Settings\LogsSettings.cs" />
+    <Compile Include="Settings\PatternSettings.cs" />
+    <Compile Include="Settings\PlaybackSettings.cs" />
+    <Compile Include="Settings\ScriptSettings.cs" />
+    <Compile Include="Helpers\CustEventArgs.cs" />
+    <Compile Include="CustomControls\BCheckbox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\BCheckbox.Designer.cs">
+      <DependentUpon>BCheckbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\Colors.cs" />
+    <Compile Include="Settings\ConnectionSettings.cs" />
+    <Compile Include="Authorizarion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Authorizarion.Designer.cs">
+      <DependentUpon>Authorizarion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\Fonts.cs" />
+    <Compile Include="CustomControls\PopupSearchPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\PopupSearchPanel.designer.cs">
+      <DependentUpon>PopupSearchPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\QuickSearchCard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\QuickSearchCard.designer.cs">
+      <DependentUpon>QuickSearchCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatesForm.Designer.cs">
+      <DependentUpon>DatesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Details.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Details.Designer.cs">
+      <DependentUpon>Details.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DialogBoxes\BMessageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DialogBoxes\BMessageForm.designer.cs">
+      <DependentUpon>BMessageForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EventLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EventLog.Designer.cs">
+      <DependentUpon>EventLog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Encrypter.cs" />
+    <Compile Include="Helpers\EventLogs.cs" />
+    <Compile Include="ExcelFeature.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExcelFeature.Designer.cs">
+      <DependentUpon>ExcelFeature.cs</DependentUpon>
+    </Compile>
+    <Compile Include="History.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="History.Designer.cs">
+      <DependentUpon>History.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageCutter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageCutter.Designer.cs">
+      <DependentUpon>ImageCutter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\ImageLoader.cs" />
+    <Compile Include="Settings\IniSettings.cs" />
+    <Compile Include="Helpers\Kernel32.cs" />
+    <Compile Include="Helpers\KeyboardHook.cs" />
+    <Compile Include="CustomControls\multicontactChosen.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\multicontactChosen.Designer.cs">
+      <DependentUpon>multicontactChosen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\nocontactChosen.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\nocontactChosen.Designer.cs">
+      <DependentUpon>nocontactChosen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ParkedCard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ParkedCard.Designer.cs">
+      <DependentUpon>ParkedCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Preview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Preview.Designer.cs">
+      <DependentUpon>Preview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CustomControls\HistoryCard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\HistoryCard.Designer.cs">
+      <DependentUpon>HistoryCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\ringCard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\ringCard.Designer.cs">
+      <DependentUpon>ringCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\XMLReadWriter.cs" />
+    <Compile Include="Helpers\User32.cs" />
+    <Compile Include="Settings\SuperUSERSettings.cs" />
+    <Compile Include="Settings\SystemSettings.cs" />
+    <Compile Include="Settings\TraySettings.cs" />
+    <Compile Include="SettingUC\ConnectionSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\ConnectionSettings.Designer.cs">
+      <DependentUpon>ConnectionSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\Debug.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\Debug.Designer.cs">
+      <DependentUpon>Debug.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\Hotkeys.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\Hotkeys.Designer.cs">
+      <DependentUpon>Hotkeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\Integration.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\Integration.Designer.cs">
+      <DependentUpon>Integration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\Interface.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\Interface.Designer.cs">
+      <DependentUpon>Interface.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\PatternSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\PatternSettings.designer.cs">
+      <DependentUpon>PatternSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\SavedData.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\SavedData.Designer.cs">
+      <DependentUpon>SavedData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\ScriptSettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\ScriptSettingsControl.Designer.cs">
+      <DependentUpon>ScriptSettingsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\Sound.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\Sound.Designer.cs">
+      <DependentUpon>Sound.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UnunsweredForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UnunsweredForm.Designer.cs">
+      <DependentUpon>UnunsweredForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\UserSettings.cs" />
+    <Compile Include="SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingUC\GeneralSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SettingUC\GeneralSettings.Designer.cs">
+      <DependentUpon>GeneralSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Splash.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Splash.Designer.cs">
+      <DependentUpon>Splash.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\UserInterfaceAPI.cs" />
+    <EmbeddedResource Include="About.resx">
+      <DependentUpon>About.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddToBook.resx">
+      <DependentUpon>AddToBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Authorizarion.resx">
+      <DependentUpon>Authorizarion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BeforeSplash.resx">
+      <DependentUpon>BeforeSplash.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BLFPanel.resx">
+      <DependentUpon>BLFPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\BPatternRow.resx">
+      <DependentUpon>BPatternRow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\Card.resx">
+      <DependentUpon>Card.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\contactChosen.resx">
+      <DependentUpon>contactChosen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\ContactRow.resx">
+      <DependentUpon>ContactRow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Contacts.resx">
+      <DependentUpon>Contacts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ContactsBook.resx">
+      <DependentUpon>ContactsBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\BCheckbox.resx">
+      <DependentUpon>BCheckbox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\HiddenSplash.resx">
+      <DependentUpon>HiddenSplash.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\PopupSearchPanel.resx">
+      <DependentUpon>PopupSearchPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\QuickSearchCard.resx">
+      <DependentUpon>QuickSearchCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DatesForm.resx">
+      <DependentUpon>DatesForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Details.resx">
+      <DependentUpon>Details.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DialogBoxes\BMessageForm.resx">
+      <DependentUpon>BMessageForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EventLog.resx">
+      <DependentUpon>EventLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExcelFeature.resx">
+      <DependentUpon>ExcelFeature.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="History.resx">
+      <DependentUpon>History.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageCutter.resx">
+      <DependentUpon>ImageCutter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\multicontactChosen.resx">
+      <DependentUpon>multicontactChosen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\nocontactChosen.resx">
+      <DependentUpon>nocontactChosen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Preview.resx">
+      <DependentUpon>Preview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\HistoryCard.resx">
+      <DependentUpon>HistoryCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\ringCard.resx">
+      <DependentUpon>ringCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\ConnectionSettings.resx">
+      <DependentUpon>ConnectionSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\Debug.resx">
+      <DependentUpon>Debug.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\GeneralSettings.resx">
+      <DependentUpon>GeneralSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\Hotkeys.resx">
+      <DependentUpon>Hotkeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\Integration.resx">
+      <DependentUpon>Integration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\Interface.resx">
+      <DependentUpon>Interface.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\PatternSettings.resx">
+      <DependentUpon>PatternSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\SavedData.resx">
+      <DependentUpon>SavedData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\ScriptSettingsControl.resx">
+      <DependentUpon>ScriptSettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingUC\Sound.resx">
+      <DependentUpon>Sound.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Splash.resx">
+      <DependentUpon>Splash.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UnunsweredForm.resx">
+      <DependentUpon>UnunsweredForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="app.manifest" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\downKey.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GOTHIC.TTF" />
+    <None Include="Resources\GOTHICB.TTF" />
+    <None Include="Resources\GOTHICBI.TTF" />
+    <None Include="Resources\GOTHICI.TTF" />
+    <None Include="Resources\upKey.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\no_photo.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\play.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\play_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mail.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hangup_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hold_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cmd_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\conference_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blind_trasfer_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add_contact.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\trasfer_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edit_contact.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\history.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\contact.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\line.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\play_small1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\download.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\copy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\close.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\all - копия.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search_mini.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\searchmini.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\all - копия %282%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blf_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blf_on.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blf_on_.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mail_off.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AsteriskManager\AsteriskManager.csproj">
+      <Project>{8e0f6b73-3a32-4461-be79-5a465c117e13}</Project>
+      <Name>AsteriskManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\down_active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\down_on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\up_active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\up_on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mail_clicked.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\line1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add_contact_on.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rem.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rotateleft.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rotateright.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OnlineIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app_icon_converted.ico" />
+    <None Include="Resources\w128h1281338911640arrowright2.png" />
+    <None Include="Resources\stop.png" />
+    <None Include="Resources\outgoing.png" />
+    <None Include="Resources\incoming.png" />
+    <None Include="Resources\export.png" />
+    <None Include="Resources\callpanel.png" />
+    <None Include="Resources\Close_Program.png" />
+    <None Include="Resources\auto_call_on.png" />
+    <None Include="Resources\auto_call.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

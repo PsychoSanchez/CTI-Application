@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8E0F6B73-3A32-4461-BE79-5A465C117E13}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AsteriskManager</RootNamespace>
+    <AssemblyName>AsteriskManager</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Data\ChannelData.cs" />
+    <Compile Include="Data\ClientsData.cs" />
+    <Compile Include="Data\DialData.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Manager\ActionManager.cs" />
+    <Compile Include="Manager\Actions\AbsoluteTimeoutAction.cs" />
+    <Compile Include="Manager\Actions\ChallengeAction.cs" />
+    <Compile Include="Manager\Actions\CommandAction.cs" />
+    <Compile Include="Manager\Actions\GetVarAction.cs" />
+    <Compile Include="Manager\Actions\HangupAction.cs" />
+    <Compile Include="Manager\Actions\ListCommandsAction.cs" />
+    <Compile Include="Manager\Actions\LoginAction.cs" />
+    <Compile Include="Manager\Actions\LogoffAction.cs" />
+    <Compile Include="Manager\Actions\OriginateAction.cs" />
+    <Compile Include="Manager\Actions\ParkAction.cs" />
+    <Compile Include="Manager\Actions\ParkedCallsAction.cs" />
+    <Compile Include="Manager\Actions\PingAction.cs" />
+    <Compile Include="Manager\Actions\RedirectAction.cs" />
+    <Compile Include="Manager\Actions\ReloadAction.cs" />
+    <Compile Include="Manager\Actions\SippeersAction.cs" />
+    <Compile Include="Manager\Actions\SIPShowPeerAction.cs" />
+    <Compile Include="Manager\Actions\StatusAction.cs" />
+    <Compile Include="AMIManager.cs" />
+    <Compile Include="Manager\EventManager.cs" />
+    <Compile Include="Exceptions\Exceptions.cs" />
+    <Compile Include="Manager\Event\DialBeginEvent.cs" />
+    <Compile Include="Manager\Event\DialEndEvent.cs" />
+    <Compile Include="Manager\Event\HoldEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\ChallengeEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\CoreShowChannelsEvent.cs" />
+    <Compile Include="Manager\Event\HangupEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\LoginEvent.cs" />
+    <Compile Include="Manager\Event\NewChannelEvent.cs" />
+    <Compile Include="Manager\Event\NewstateEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\OriginateEvent.cs" />
+    <Compile Include="Manager\Event\OriginateResponseEvent.cs" />
+    <Compile Include="Manager\Event\ParkedCallEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\ParkedCallsCompleteEvent.cs" />
+    <Compile Include="Manager\Event\PeerEntryEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\PeerlistCompleteEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\SIPShowPeerEvent.cs" />
+    <Compile Include="Manager\Event\InnerEvents\StatusEvent.cs" />
+    <Compile Include="Manager\Event\RTCPSentEvent.cs" />
+    <Compile Include="Manager\Event\UnholdEvent.cs" />
+    <Compile Include="Manager\Response\ResponseHandler.cs" />
+    <Compile Include="Manager\Response\ResponseManager.cs" />
+    <Compile Include="Parser\Helper.cs" />
+    <Compile Include="Parser\AsterParser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RingInfo.cs" />
+    <Compile Include="Connect\SocketConnection.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

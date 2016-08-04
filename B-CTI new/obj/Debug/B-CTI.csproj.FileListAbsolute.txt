@@ -1,0 +1,2 @@
+C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\B-CTI new\bin\Debug\B-CTI.exe.config
+C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\B-CTI new\obj\Debug\B-CTI.csproj.ResolveComReference.cache
