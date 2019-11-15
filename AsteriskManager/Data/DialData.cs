@@ -1,12 +1,13 @@
 ﻿using System;
+using AsteriskManager.Manager.Event;
 
 namespace AsteriskManager
 {
-    public class DialData : ICloneable
+    public class DialData : ICloneable, IDialChannelInfo
     {
         public enum Dialstat
         {
-            DialBegin11 =0,
+            DialBegin11 = 0,
             DialBegin = 1,
             ConversationBegin = 2,
             ConversationEnd = 3
@@ -23,10 +24,7 @@ namespace AsteriskManager
         public string Uniqueid2 { get; set; }
         public string Dialstring { get; set; }
 
-        public DialData()
-        {
-
-        }
+        public DialData() { }
 
         public object Clone()
         {

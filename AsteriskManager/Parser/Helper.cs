@@ -106,16 +106,7 @@ namespace AsteriskManager
                 {
                     sb.Append(action.Parameters);
                 }
-                //Он был написан одним из параметров в вики, однако в примерах не указывается. В случае если он не требуется, можно удалить.
-                //if (string.IsNullOrEmpty(internalActionId))
-                //{
-                //    actionIDvlaue = action.ActionID;
-                //}
-                //else
-                //{
-                //    actionIDvlaue = string.Concat(internalActionId, INTERNAL_CATION_ID_DELIMETER, action.ActionID);
-                //}
-                //
+
                 sb.Append(LINE_SEPARATOR);
 #if LOG
                 DateTime date = DateTime.Now;
@@ -147,20 +138,24 @@ namespace AsteriskManager
         /// <param name="parameterName">Указатель на искомые данные</param>
         public static string GetParameterValue(string SourceString, string parameterName)
         {
-            if (SourceString.Contains(parameterName))
+            if (!SourceString.Contains(parameterName))
             {
-                var message = SourceString.Substring(SourceString.IndexOf(parameterName));
-                message += Helper.LINE_SEPARATOR;
-                int startPos = parameterName.Length;
-                int length = message.IndexOf(Helper.LINE_SEPARATOR) - startPos;
-                message = message.Substring(startPos, length);
-                if (!string.IsNullOrEmpty(message))
-                    return message;
-                else
-                    return string.Empty;
-            }
-            else
                 return string.Empty;
+            }
+
+            var message = SourceString.Substring(SourceString.IndexOf(parameterName));
+            message += Helper.LINE_SEPARATOR;
+
+            int startPos = parameterName.Length;
+            int length = message.IndexOf(Helper.LINE_SEPARATOR) - startPos;
+            message = message.Substring(startPos, length);
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                return message;
+            }
+
+            return string.Empty;
         }
         /// <summary>
         /// Функция парсер для команды CoreShowChannels
@@ -194,59 +189,45 @@ namespace AsteriskManager
         public static DialData ChannelDataToDialRev11(ChannelData channel)
         {
             DialData dial = new DialData();
-            if (channel.CallerIDName != null)
+
+
+            if (!IsNullOrNotBCTI(channel.CallerIDName) || !IsNullOrNotBCTI(channel.ConnectedLineName))
             {
-                if (channel.CallerIDName.Contains("B-CTI"))
-                {
-                    dial.CallerIDNum = channel.CallerIDNum;
-                    dial.CallerIDName = channel.CallerIDName;
-                    dial.ConnectedLineNum = channel.ConnectedLineNum;
-                    dial.ConnectedLineName = channel.ConnectedLineName;
-                }
-                else
-                {
-                    dial.CallerIDNum = channel.ConnectedLineNum;
-                    dial.CallerIDName = channel.ConnectedLineName;
-                    dial.ConnectedLineNum = channel.CallerIDNum;
-                    dial.ConnectedLineName = channel.CallerIDName;
-                }
-            }
-            else if (channel.ConnectedLineName != null)
-            {
-                if (channel.ConnectedLineName.Contains("B-CTI"))
-                {
-                    dial.CallerIDNum = channel.CallerIDNum;
-                    dial.CallerIDName = channel.CallerIDName;
-                    dial.ConnectedLineNum = channel.ConnectedLineNum;
-                    dial.ConnectedLineName = channel.ConnectedLineName;
-                }
-                else
-                {
-                    dial.CallerIDNum = channel.ConnectedLineNum;
-                    dial.CallerIDName = channel.ConnectedLineName;
-                    dial.ConnectedLineNum = channel.CallerIDNum;
-                    dial.ConnectedLineName = channel.CallerIDName;
-                }
+                CopyCallersInfo(channel, dial);
             }
             else
             {
-                dial.CallerIDNum = channel.ConnectedLineNum;
-                dial.CallerIDName = channel.ConnectedLineName;
-                dial.ConnectedLineNum = channel.CallerIDNum;
-                dial.ConnectedLineName = channel.CallerIDName;
+                CopyAndInvertCallersInfo(channel, dial);
             }
+
+
             dial.ChannelID = channel.ChannelID;
-            if (!string.IsNullOrEmpty(channel.Link))
-            {
-                dial.DestinationID = channel.Link;
-            }
-            else
-            {
-                dial.DestinationID = string.Empty;
-            }
+            dial.DestinationID = string.IsNullOrEmpty(channel.Link) ? string.Empty : channel.Link;
             dial.Uniqueid = channel.Uniqueid;
             return dial;
         }
+
+        private static bool IsNullOrNotBCTI(string val)
+        {
+            return val == null || !val.Contains("B-CTI");
+        }
+
+        private static void CopyAndInvertCallersInfo(ChannelData channel, DialData dial)
+        {
+            dial.CallerIDNum = channel.ConnectedLineNum;
+            dial.CallerIDName = channel.ConnectedLineName;
+            dial.ConnectedLineNum = channel.CallerIDNum;
+            dial.ConnectedLineName = channel.CallerIDName;
+        }
+
+        private static void CopyCallersInfo(ChannelData channel, DialData dial)
+        {
+            dial.CallerIDNum = channel.CallerIDNum;
+            dial.CallerIDName = channel.CallerIDName;
+            dial.ConnectedLineNum = channel.ConnectedLineNum;
+            dial.ConnectedLineName = channel.ConnectedLineName;
+        }
+
         /// <summary>
         /// Превращает данные открытого канала в информацию о звонке
         /// </summary>
@@ -255,20 +236,10 @@ namespace AsteriskManager
         public static DialData ChannelDataToDial(ChannelData channel)
         {
             DialData dial = new DialData();
-            dial.CallerIDNum = channel.CallerIDNum;
-            dial.CallerIDName = channel.CallerIDName;
-            dial.ConnectedLineNum = channel.ConnectedLineNum;
-            dial.ConnectedLineName = channel.ConnectedLineName;
+            CopyCallersInfo(channel, dial);
 
             dial.ChannelID = channel.ChannelID;
-            if (!string.IsNullOrEmpty(channel.Link))
-            {
-                dial.DestinationID = channel.Link;
-            }
-            else
-            {
-                dial.DestinationID = string.Empty;
-            }
+            dial.DestinationID = string.IsNullOrEmpty(channel.Link) ? string.Empty : channel.Link;
             dial.Uniqueid = channel.Uniqueid;
             return dial;
         }
@@ -479,113 +450,6 @@ namespace AsteriskManager
             return accessors;
         }
 
-        #endregion
-
-        #region YaroslavRegion
-        ///// <summary>
-        ///// Временный парсер для ответов
-        ///// </summary>
-        ///// <param name="ParseString"></param>
-        ///// <param name="response"></param>
-        ///// <returns></returns>
-        //public static string ParseResponse(string ParseString, string response)
-        //{
-        //    Regex matchExpression1 = new Regex(response);
-        //    ParseString = ParseString.Substring(matchExpression1.Match(ParseString).Index);
-        //    return ParseString;
-        //}
-        ///// <summary>
-        ///// Возвращает все данные по определенному параметру
-        ///// </summary>
-        ///// <param name="asterInfo">Информация в строковой переменной</param>
-        ///// <param name="matchfinder">Указатель на искомые данные</param>
-        ///// <param name="clientsdata">Извлечённые данные</param>
-        ///// <param name="number">Число, определяющее количество извлекаемых символов</param>
-        //public static List<string> GetDataByParam(string asterinfo, string matchfinder, int number)
-        //{
-        //    List<string> clientsdata = new List<string>();
-        //    Regex matchexpression = new Regex(matchfinder);
-        //    foreach (Match match in matchexpression.Matches(asterinfo))
-        //    {
-        //        string data = asterinfo.Substring(match.Index).Remove(matchfinder.Length + number);
-        //        clientsdata.Add(data);
-        //    }
-        //    return clientsdata;
-        //}
-        ///// <summary>
-        ///// Извлечение данных из информации
-        ///// </summary>
-        ///// <param name="asterInfo">Информация в строковой переменной</param>
-        ///// <param name="matchfinder"></param>
-        ///// <param name="clientsdata"></param>
-        ///// <param name="more"></param>
-        //public static string FindInResponse(string asterInfo, string matchfinder/*, bool moreВот этот аргумент передается очень умным человеком, только для того, чтобы работала перегурзка. Браво!*/)
-        //{
-        //    Regex matchExpression = new Regex(matchfinder);
-        //    if (!matchExpression.Match(asterInfo).Success)
-        //        return null;
-
-        //    string sentence = asterInfo.Substring(matchExpression.Match(asterInfo).Index + matchfinder.Length);
-        //    int startIndex = sentence.IndexOf('\n');
-        //    //2 решения
-        //    //sentence = sentence.Replace(System.Environment.NewLine, "");
-        //    //string removedBreaks = sentence.Replace("\r\n", "").Replace("\n", "").Replace("\r", "");
-        //    return sentence;
-        //}
-
-        ///// <summary>
-        ///// Извлечение данных из информации
-        ///// </summary>
-        ///// <param name="asterInfo">Информация в строковой переменной</param>
-        ///// <param name="matchfinder">Указатель на искомые данные</param>
-        ///// <param name="clientsdata">Извлечённые данные</param>
-        ///// <param name="listOfClients">Коллекция массивов строк для извлечённых данных</param>
-        //public static string[] DataExtraction(string asterInfo, string matchfinder, string[] clientsdata)
-        //{
-        //    int num = 0;
-        //    if (new Regex(matchfinder).Matches(asterInfo).Count == 0)
-        //        return null;
-
-        //    foreach (Match match in new Regex(matchfinder).Matches(asterInfo))
-        //    {
-        //        string sentence = asterInfo.Substring(match.Index + matchfinder.Length);
-        //        int startIndex = sentence.IndexOf('\r');
-        //        sentence = sentence.Remove(startIndex);
-        //        if (num == clientsdata.Length)
-        //        {
-        //            break;
-        //        }
-        //        clientsdata[num] = sentence;
-        //        num++;
-        //    }
-
-        //    return (string[])clientsdata.Clone();
-        //}
-
-
-
-        ///// <summary>
-        ///// Извлечение данных из иформации
-        ///// </summary>
-        ///// <param name="asterInfo">Строковая переменная, из которой извлекаются данные</param>
-        ///// <param name="matchfinder">Совпадение, которое нужно отысказть</param>
-        ///// <param name="clientsdata">Коллекция строк, в которую извлечены данные</param>
-        //public static List<string> DataExtraction(string asterInfo, string matchfinder)
-        //{
-        //    List<string> clientsdata = new List<string>();
-        //    Regex matchExpression = new Regex(matchfinder);
-        //    foreach (Match match in matchExpression.Matches(asterInfo))
-        //    {
-        //        string sentence = asterInfo.Substring(matchExpression.Match(asterInfo).Index + matchfinder.Length);
-        //        int startIndex = sentence.IndexOf('\n');
-        //        if (startIndex == -1)
-        //            return null;
-
-        //        sentence = sentence.Remove(startIndex);
-        //        clientsdata.Add(sentence);
-        //    }
-        //    return clientsdata;
-        //}
         #endregion
     }
 }

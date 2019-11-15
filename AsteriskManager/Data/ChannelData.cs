@@ -1,4 +1,5 @@
 ﻿using System;
+using AsteriskManager.Manager.Event;
 
 namespace AsteriskManager
 {
@@ -16,7 +17,7 @@ namespace AsteriskManager
     /// <summary>
     /// Класс хранящий информацию о активном канале
     /// </summary>
-    public class ChannelData : ICloneable
+    public class ChannelData : ICloneable, IDialChannelInfo
     {
         public ChannelState State;
         private string _state;
@@ -50,17 +51,26 @@ namespace AsteriskManager
         public string ConnectedLineNum { get; set; }
         public string ConnectedLineName { get; set; }
         public string Context { get; set; }
+        public ChannelData() { }
 
-        public ChannelData()
-        {
-
-        }
         public ChannelData(string _channel, string _location, string _state, string _appdata)
         {
             ChannelID = _channel;
             Location = _location;
             Status = _state;
             ApplicationData = _appdata;
+        }
+
+        public void SetConnectedLineInfo(string connectedLineNum, string connectedLineName)
+        {
+            ConnectedLineNum = ConnectedLineNum;
+            ConnectedLineName = connectedLineName;
+        }
+
+        public void SetCallerInfo(string callerNum, string callerName)
+        {
+            CallerIDNum = callerNum;
+            CallerIDName = callerName;
         }
 
         public object Clone()

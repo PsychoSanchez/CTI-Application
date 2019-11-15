@@ -66,6 +66,7 @@
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="Manager\Event\DialBeginEvent.cs" />
     <Compile Include="Manager\Event\DialEndEvent.cs" />
+    <Compile Include="Manager\Event\IDialChannelsInfo.cs" />
     <Compile Include="Manager\Event\HoldEvent.cs" />
     <Compile Include="Manager\Event\InnerEvents\ChallengeEvent.cs" />
     <Compile Include="Manager\Event\InnerEvents\CoreShowChannelsEvent.cs" />
