@@ -1,6 +1,6 @@
 namespace AsteriskManager.Manager.Event
 {
-    interface IDialChannelInfo
+    public interface IDialChannelInfo
     {
         string CallerIDNum { get; set; }
         string CallerIDName { get; set; }

@@ -138,12 +138,13 @@ namespace AsteriskManager
         /// <param name="parameterName">Указатель на искомые данные</param>
         public static string GetParameterValue(string SourceString, string parameterName)
         {
-            if (!SourceString.Contains(parameterName))
+            var indexOfValue = SourceString.IndexOf(parameterName);
+            if (indexOfValue < 0)
             {
                 return string.Empty;
             }
 
-            var message = SourceString.Substring(SourceString.IndexOf(parameterName));
+            var message = SourceString.Substring(indexOfValue);
             message += Helper.LINE_SEPARATOR;
 
             int startPos = parameterName.Length;

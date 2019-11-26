@@ -1,6 +1,6 @@
 ﻿namespace AsteriskManager.Manager.Event
 {
-    class NewstateEvent : EventManager, IDialChannelInfo
+    public class NewstateEvent : EventManager, IDialChannelInfo
     {
         public string Channel { get; set; }
         public string ChannelState { get; set; }

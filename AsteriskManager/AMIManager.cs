@@ -19,202 +19,16 @@ namespace AsteriskManager
 {
     public class AMIManager
     {
-        const string UNKNOWN_NUMBER = "<unknown>";
-        const string ROSTELEKOM_LINE_NUMBER = "rostelecom";
+
+        private ActiveChannelManager activeChannels = new ActiveChannelManager();
 
         #region Функции для работы с массивами данных
-        private AutoResetEvent ActiveChanSemaphore = new AutoResetEvent(true);
-
-        private void DefaultChannelInfoValues(DialData dial)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                for (int i = 0; i < ActiveChannels.Count; i++)
-                {
-                    ChannelData channel = ActiveChannels[i];
-                    if (!channel.ChannelID.Equals(dial.ChannelID))
-                    {
-                        continue;
-                    }
-
-
-                    DefaultChannelCallerInfo(channel, dial);
-                    DefaultChannelConnectedLineInfo(channel, dial);
-                    ActiveChanSemaphore.Set();
-                    return;
-                }
-                ActiveChanSemaphore.Set();
-                return;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                ActiveChanSemaphore.Set();
-                DefaultChannelInfoValues(dial);
-            }
-        }
-
-        private ChannelData DefaultChannelInfoValues(NewstateEvent ChannelInfo)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                for (int i = 0; i < ActiveChannels.Count; i++)
-                {
-                    ChannelData activeChannel = ActiveChannels[i];
-                    if (!activeChannel.ChannelID.Equals(ChannelInfo.Channel))
-                    {
-                        continue;
-                    }
-
-                    ChannelData updatedActiveChannel = GetChannelDataWithUpdatedEventInfo(activeChannel, ChannelInfo);
-                    ActiveChanSemaphore.Set();
-                    return updatedActiveChannel;
-                }
-                ActiveChanSemaphore.Set();
-                return null;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                ActiveChanSemaphore.Set();
-                return DefaultChannelInfoValues(ChannelInfo);
-            }
-        }
-        private ChannelData GetChannelDataWithUpdatedEventInfo(ChannelData activeChannelData, NewstateEvent channelInfo)
-        {
-            if (!string.IsNullOrEmpty(channelInfo.ChannelState))
-            {
-                activeChannelData.Status = channelInfo.ChannelState;
-            }
-
-            if (!string.IsNullOrEmpty(channelInfo.ChannelStateDesc))
-            {
-                activeChannelData.ChannelStateDesc = channelInfo.ChannelStateDesc;
-            }
-
-            if (!string.IsNullOrEmpty(channelInfo.Context))
-            {
-                activeChannelData.Context = channelInfo.Context;
-            }
-
-            DefaultChannelCallerInfo(activeChannelData, channelInfo);
-            DefaultChannelConnectedLineInfo(activeChannelData, channelInfo);
-
-            return activeChannelData;
-        }
-
-        private void DefaultChannelCallerInfo(IDialChannelInfo target, IDialChannelInfo source)
-        {
-            // FastPath
-            if (!IsNullEmptyOrUnknownNumber(target.CallerIDNum))
-            {
-                return;
-            }
-
-            UpdateChannelCallerInfo(target, source);
-        }
-
-        private void UpdateChannelCallerInfo(IDialChannelInfo target, IDialChannelInfo source)
-        {
-            if (!IsNullEmptyOrUnknownNumber(source.CallerIDNum))
-            {
-                target.CallerIDNum = source.CallerIDNum;
-            }
-
-            if (!IsNullEmptyOrUnknownNumber(source.CallerIDName))
-            {
-                target.CallerIDName = source.CallerIDName;
-            }
-        }
-
-        private void DefaultChannelConnectedLineInfo(IDialChannelInfo target, IDialChannelInfo source)
-        {
-            // FastPath
-            if (!IsNullEmptyOrUnknownNumber(target.CallerIDNum))
-            {
-                return;
-            }
-
-            UpdateChannelConnectedLineInfo(target, source);
-        }
-
-        private void UpdateChannelConnectedLineInfo(IDialChannelInfo target, IDialChannelInfo source)
-        {
-            if (!IsNullEmptyOrUnknownNumber(source.ConnectedLineNum))
-            {
-                target.ConnectedLineNum = source.ConnectedLineNum;
-            }
-
-            if (!IsNullEmptyOrUnknownNumber(source.ConnectedLineName))
-            {
-                target.ConnectedLineName = source.ConnectedLineName;
-            }
-        }
-
-        private bool IsNullEmptyOrUnknownNumber(string value)
-        {
-            return string.IsNullOrEmpty(value) || value == UNKNOWN_NUMBER;
-        }
-
-        private ChannelData RemoveActiveChannel(string ChannelID)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                for (int j = 0; j < ActiveChannels.Count; j++)
-                {
-                    if (!ActiveChannels[j].ChannelID.Equals(ChannelID))
-                    {
-                        continue;
-                    }
-
-                    var removedchannel = ActiveChannels[j];
-                    ActiveChannels.RemoveAt(j);
-                    ActiveChanSemaphore.Set();
-                    return removedchannel;
-                }
-
-                ActiveChanSemaphore.Set();
-                return null;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                ActiveChanSemaphore.Set();
-                return RemoveActiveChannel(ChannelID);
-            }
-        }
-        private void UpdateChannelCallerID(ChannelData Channel, ChannelData Destination)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                for (int i = 0; i < ActiveChannels.Count; i++)
-                {
-                    if (!Channel.Equals(ActiveChannels[i]))
-                    {
-                        continue;
-                    }
-
-                    ActiveChannels[i].ConnectedLineNum = Destination.CallerIDNum;
-                    ActiveChanSemaphore.Set();
-                    return;
-                }
-                ActiveChanSemaphore.Set();
-                return;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                ActiveChanSemaphore.Set();
-                UpdateChannelCallerID(Channel, Destination);
-            }
-        }
-
         private DialData TryGetDialChannelInfoAndUpdateDial(DialData dial)
         {
-            ChannelData channel = FindChInfoByChID(dial.ChannelID);
+            ChannelData channel = activeChannels.FindChInfoByChID(dial.ChannelID);
             if (channel == null)
             {
-                channel = FindChInfoByChID(dial.DestinationID);
+                channel = activeChannels.FindChInfoByChID(dial.DestinationID);
             }
 
             if (channel == null)
@@ -223,71 +37,34 @@ namespace AsteriskManager
             }
 
             ///Если номера совпадают подтягиваем второй канла
-            UpdateDialInfoWithChannelInfo(dial, channel);
+            activeChannels.UpdateDialInfoWithChannelInfo(dial, channel);
 
             UpdateActiveCalls(dial);
 
             return dial;
         }
-
-
-        private void UpdateDialInfoWithChannelInfo(DialData dial, ChannelData channel)
+        public ChannelData FindChannel(string connectedLineNum)
         {
-            if (channel.CallerIDNum == channel.ConnectedLineNum)
+            try
             {
-                TryUpdateChannelInfoWithDestinationChannelInfo(channel, dial.DestinationID);
+                ChannelData channel = activeChannels.GetChannelByCallerNumbers(connectedLineNum, UserData.Number);
+
+                return channel != null ? channel : FindConnectedChannel(connectedLineNum);
             }
-
-            ///Если номер из канала не неизвестен и не пуст, то применяем его для нашего звонка
-            UpdateChannelCallerInfo(dial, channel);
-            ///Если номер из канала не неизвестен и не пуст, то применяем его для нашего звонка
-            UpdateChannelConnectedLineInfo(dial, channel);
-
-            ///Теперь по крайней мере 1 из номеров точно известен, осталось разобраться со вторым
-            ///Для этого подтягиваем номер из айдишника канала или из dialstring
-
-            if (IsNullEmptyOrUnknownNumber(dial.CallerIDNum))
+            catch (IndexOutOfRangeException)
             {
-                dial.CallerIDNum = GetCallerId(dial.ChannelID, dial.Dialstring);
-            }
-
-
-            ///Если номер к которому подключен абонент неизвестен или пуст, то ищем канал к подключения и получаем колерайди из него
-            if (IsNullEmptyOrUnknownNumber(dial.ConnectedLineNum))
-            {
-                var dest = FindChInfoByChID(dial.DestinationID);
-                if (dest != null && !IsNullEmptyOrUnknownNumber(dest.CallerIDNum))
-                {
-                    dial.ConnectedLineNum = dest.CallerIDNum;
-                }
-            }
-
-            ///Если он все еще неизвестен или пуст прибегаем к последнему варианту, получаем колер айди из айди канала
-            if (IsNullEmptyOrUnknownNumber(dial.ConnectedLineNum))
-            {
-                dial.ConnectedLineNum = GetCallerId(dial.DestinationID, dial.Dialstring);
+                return FindChannel(connectedLineNum);
             }
         }
-
-        private static string GetCallerId(string channelID, string dialstring)
+        public ChannelData FindConnectedChannel(string CallerIDNum)
         {
-            string callerId = Helper.GetNumberFromChannel(channelID);
-
-            if (callerId == ROSTELEKOM_LINE_NUMBER)
+            try
             {
-                // Remove rostelecom prefix
-                return dialstring.Replace("rostelecom/", "");
+                return activeChannels.GetChannelByCallerNumbers(UserData.Number, CallerIDNum);
             }
-
-            return callerId;
-        }
-
-        private void TryUpdateChannelInfoWithDestinationChannelInfo(ChannelData channel, string channelDestinationId)
-        {
-            var dest = FindChInfoByChID(channelDestinationId);
-            if (dest != null)
+            catch (IndexOutOfRangeException)
             {
-                UpdateChannelCallerID(channel, dest);
+                return FindConnectedChannel(CallerIDNum);
             }
         }
 
@@ -305,8 +82,8 @@ namespace AsteriskManager
 
                     if (isSameChannelId || isSameUniqueId || isSameUniqueId2)
                     {
-                        UpdateChannelCallerInfo(dial, ActiveCalls[i]);
-                        UpdateChannelConnectedLineInfo(dial, ActiveCalls[i]);
+                        activeChannels.UpdateChannelCallerInfo(dial, ActiveCalls[i]);
+                        activeChannels.UpdateChannelConnectedLineInfo(dial, ActiveCalls[i]);
                         ActiveCalls.RemoveAt(i);
 
                         break;
@@ -323,142 +100,7 @@ namespace AsteriskManager
                 Calls.Set();
             }
         }
-        /// <summary>
-        /// Функция поиска канала по номеру
-        /// </summary>
-        /// <param name="connectedLineNum">Номер звонящего</param>
-        /// <returns>Возвращает канал или нулл если канала с таким номером нет</returns>
-        private ChannelData FindChannel(string connectedLineNum)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                ChannelData channel = GetChannelByCallerNumbers(connectedLineNum, UserData.Number);
 
-                return channel != null ? channel : FindConnectedChannel(connectedLineNum);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return FindChannel(connectedLineNum);
-            }
-            finally
-            {
-                ActiveChanSemaphore.Set();
-            }
-        }
-
-        private ChannelData GetChannelByCallerNumbers(string callerIdNum, string connectedLineNum)
-        {
-            for (int i = 0; i < ActiveChannels.Count; i++)
-            {
-                ChannelData channel = ActiveChannels[i];
-                if (channel.CallerIDNum != callerIdNum || channel.ConnectedLineNum != connectedLineNum)
-                {
-                    continue;
-                }
-
-                return channel;
-            }
-
-            return null;
-        }
-
-        private ChannelData FindChannel(string callerNum, string connectedNum)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                return GetChannelByCallerNumbers(callerNum, connectedNum);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return FindChannel(callerNum, connectedNum);
-            }
-            finally
-            {
-                ActiveChanSemaphore.Set();
-            }
-        }
-        /// <summary>
-        /// Функция поиска канала к которому подключен наш номер
-        /// </summary>
-        /// <param name="CallerIDNum"></param>
-        /// <returns></returns>
-        private ChannelData FindConnectedChannel(string CallerIDNum)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                return GetChannelByCallerNumbers(UserData.Number, CallerIDNum);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return FindConnectedChannel(CallerIDNum);
-            }
-            finally
-            {
-                ActiveChanSemaphore.Set();
-            }
-        }
-        /// <summary>
-        /// Находит полную информацию о канале по его ID
-        /// </summary>
-        /// <param name="ChannelID">ID канала</param>
-        /// <returns>полная информаци о канале, если он существует</returns>
-        private ChannelData FindChInfoByChID(string ChannelID)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                for (int i = 0; i < ActiveChannels.Count; i++)
-                {
-                    if (ActiveChannels[i].ChannelID == ChannelID)
-                    {
-                        return ActiveChannels[i];
-                    }
-                }
-
-                return null;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return FindChInfoByChID(ChannelID);
-            }
-            finally
-            {
-                ActiveChanSemaphore.Set();
-            }
-        }
-        /// <summary>
-        /// Находит все каналы, на которые звонит наш абонент
-        /// </summary>
-        /// <param name="callerId">номер абонента</param>
-        /// <returns>список каналов</returns>
-        private List<ChannelData> FindChannelsWithCallerID(string callerId)
-        {
-            try
-            {
-                ActiveChanSemaphore.WaitOne();
-                List<ChannelData> channels = new List<ChannelData>();
-                for (int i = 0; i < ActiveChannels.Count; i++)
-                {
-                    if (ActiveChannels[i].CallerIDNum == callerId)
-                    {
-                        channels.Add(ActiveChannels[i]);
-                    }
-                }
-
-                return channels;
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return FindChannelsWithCallerID(callerId);
-            }
-            finally
-            {
-                ActiveChanSemaphore.Set();
-            }
-        }
         /// <summary>
         /// Функция поиска информации о активном звонке по ID канала
         /// </summary>
@@ -585,7 +227,7 @@ namespace AsteriskManager
         private void HangupEvent(object sender, AsteriskEventArgs e)
         {
             var Hangup = (HangupEvent)e.Event;
-            var RemovedChannel = RemoveActiveChannel(Hangup.Channel);
+            var RemovedChannel = activeChannels.RemoveActiveChannel(Hangup.Channel);
             if (RemovedChannel == null)
             {
                 return;
@@ -639,14 +281,14 @@ namespace AsteriskManager
         private void NewChannelState(object sender, AsteriskEventArgs e)
         {
             var CurrChanState = (NewstateEvent)e.Event;
-            var PrevChanState = DefaultChannelInfoValues(CurrChanState);
+            var PrevChanState = activeChannels.DefaultChannelInfoValues(CurrChanState);
             if ((AmiVersion == AmiVersions.v11 || AmiVersion == AmiVersions.v13) && PrevChanState != null)
             {
                 //Новый диал бегин, который создается как только мы начали дозвон.
                 if ((PrevChanState.State == ChannelState.ChannelUnavailble) && CurrChanState.ChannelState == "5")
                 {
                     //Ищем информацию по каналу, если он существует проверяем не равны ли подключенные номера
-                    var chan = FindChInfoByChID(CurrChanState.Channel);
+                    var chan = activeChannels.FindChInfoByChID(CurrChanState.Channel);
                     if (chan != null && chan.CallerIDNum != chan.ConnectedLineNum)
                     {
                         ///Генерируем событие начала звонка, так как мы ищем канал с другого конца, то переворачиваем данные Caller = Connected
@@ -661,7 +303,7 @@ namespace AsteriskManager
                 ///Исходя из логов версии 1.1 это единственный способ вызвать ивенты для звонка инициированного с мобильника
                 if (PrevChanState.State == ChannelState.ChannelUnavailble && CurrChanState.ChannelState == "6")
                 {
-                    var chan = FindChInfoByChID(CurrChanState.Channel);
+                    var chan = activeChannels.FindChInfoByChID(CurrChanState.Channel);
                     if (chan != null)
                         new DialBeginEvent(chan, true);
                     Thread.Sleep(500);
@@ -692,18 +334,7 @@ namespace AsteriskManager
         /// <param name="e"></param>
         private void NewchannelEvent(object sender, AsteriskEventArgs e)
         {
-            var NewChannel = (NewChannelEvent)e.Event;
-            ActiveChanSemaphore.WaitOne();
-            for (int i = 0; i < ActiveChannels.Count; i++)
-            {
-                if (ActiveChannels[i].ChannelID == NewChannel.Channel.ChannelID)
-                {
-                    ActiveChanSemaphore.Set();
-                    return;
-                }
-            }
-            ActiveChannels.Add(NewChannel.Channel);
-            ActiveChanSemaphore.Set();
+            activeChannels.AddActiveChannel(((NewChannelEvent)e.Event).Channel);
         }
         /// <summary>
         /// Одно из событий для звонков
@@ -749,7 +380,7 @@ namespace AsteriskManager
                         {
                             TryGetDialChannelInfoAndUpdateDial(e.dialinfo);
                             //e.dialinfo = d;
-                            DefaultChannelInfoValues(e.dialinfo);
+                            activeChannels.DefaultChannelInfoValues(e.dialinfo);
 
                             if (e.dialinfo.DestinationID != null)
                             {
@@ -817,10 +448,6 @@ namespace AsteriskManager
         public AmiVersions AmiVersion { get; private set; }
         public string CallerID { get; set; }
         private AmiLogger log = new AmiLogger();
-        /// <summary>
-        /// Информация о текущих активных каналах
-        /// </summary>
-        private List<ChannelData> ActiveChannels = new List<ChannelData>();
         /// <summary>
         /// Информация о текущих активных звонках
         /// </summary>
@@ -1397,7 +1024,7 @@ namespace AsteriskManager
         /// </summary>
         private void FreeMemeory()
         {
-            ActiveChannels.Clear();
+            activeChannels.GetChannels().Clear();
             ActiveCalls.Clear();
             AmiVersion = AmiVersions.UNKNOWN;
             ServerUsers.Clear();
@@ -1790,7 +1417,7 @@ namespace AsteriskManager
                 return false;
             }
 
-            foreach (var obj in ActiveChannels)
+            foreach (var obj in activeChannels.GetChannels())
             {
                 StatusAction status = new StatusAction(obj.ChannelID);
                 status.ActionID = CreateActionID();
@@ -1836,7 +1463,7 @@ namespace AsteriskManager
 
         public bool Call(string NumberToCall, string name)
         {
-            if (IsUserStartedCall(UserData.Number))
+            if (activeChannels.IsUserStartedCall(UserData.Number))
             {
                 return false;
             }
@@ -1858,10 +1485,6 @@ namespace AsteriskManager
             return false;
         }
 
-        private bool IsUserStartedCall(string num)
-        {
-            return ActiveChannels.Find(channel => channel.CallerIDNum == num && channel.ConnectedLineNum == num) != null;
-        }
 
         private OriginateAction GetOriginateAction(string number, string name)
         {
@@ -1906,7 +1529,7 @@ namespace AsteriskManager
         /// <returns></returns>
         public bool HangupByChannel(string ChannelID)
         {
-            var channel = FindChInfoByChID(ChannelID);
+            var channel = activeChannels.FindChInfoByChID(ChannelID);
             if (channel != null)
             {
                 InvokeHangup(ChannelID);
@@ -1921,8 +1544,8 @@ namespace AsteriskManager
         /// <returns></returns>
         public bool HangupAllAiringCalls(string AiringCallNumber)
         {
-            var channel = FindChannelsWithCallerID(AiringCallNumber);
-            var channel2 = FindChannelsWithCallerID(UserData.Number);
+            var channel = activeChannels.FindChannelsWithCallerID(AiringCallNumber);
+            var channel2 = activeChannels.FindChannelsWithCallerID(UserData.Number);
             if (channel.Count <= 0)
             {
                 return false;
@@ -1964,7 +1587,7 @@ namespace AsteriskManager
         /// <returns>Если активный канал с номером абонента существует, то отправит запрос и вернет истину</returns>
         public bool Redirect(DialData dial, string transferToNumber)
         {
-            ChannelData channel = FindChInfoByChID(dial.CallerIDNum == UserData.Number ? dial.DestinationID : dial.ChannelID);
+            ChannelData channel = activeChannels.FindChInfoByChID(dial.CallerIDNum == UserData.Number ? dial.DestinationID : dial.ChannelID);
 
             if (channel != null)
             {
