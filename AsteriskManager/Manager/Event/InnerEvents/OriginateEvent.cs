@@ -25,14 +25,7 @@ namespace AsteriskManager.Manager.Event
             }
             else
             {
-                if (message.ToLower().Contains("permission denied"))
-                {
-                    IsCallSuccess = false;
-                }
-                else
-                {
-                    IsCallSuccess = true;
-                }
+                IsCallSuccess = !message.ToLower().Contains("permission denied");
                 AMIManager.ActionIdMessages.Add(ActionID, this);
                 OriginateComplete.Set();
             }

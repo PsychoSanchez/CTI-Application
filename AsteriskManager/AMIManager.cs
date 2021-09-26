@@ -19,7 +19,6 @@ namespace AsteriskManager
 {
     public class AMIManager
     {
-
         private ActiveChannelManager activeChannels = new ActiveChannelManager();
 
         #region Функции для работы с массивами данных
@@ -632,10 +631,8 @@ namespace AsteriskManager
                 //Console.WriteLine(e.Message);
                 if (e.SocketErrorCode == SocketError.TimedOut && IsConnected)
                 {
-                    if (Disconnecting != null)
-                    {
-                        Disconnecting(this, null);
-                    }
+                    Disconnecting?.Invoke(this, null);
+
                     log.WriteLog("##Disconnectiong socketexceps timeout 1033");
                     Abort();
                     return;
@@ -649,10 +646,7 @@ namespace AsteriskManager
                     return;
                 }
 
-                if (Disconnecting != null)
-                {
-                    Disconnecting(this, null);
-                }
+                Disconnecting?.Invoke(this, null);
 
                 log.WriteLog("##Disconnectiong disposed 1047");
                 Abort();
@@ -673,14 +667,10 @@ namespace AsteriskManager
                         continue;
                     }
 
-                    if (worker.CancellationPending == true)
+                    if (worker.CancellationPending == true || e.Cancel == true)
                     {
                         e.Cancel = true;
-
-                        if (e.Cancel == true)
-                        {
-                            return;
-                        }
+                        return;
                     }
                     Ping();
                     Thread.Sleep(100);
@@ -733,18 +723,9 @@ namespace AsteriskManager
         }
         private void InstantiateWorkersOnce()
         {
-            if (Reciever == null)
-            {
-                Reciever = new BackgroundWorker();
-            }
-            if (pinger == null)
-            {
-                pinger = new BackgroundWorker();
-            }
-            if (parser == null)
-            {
-                parser = new BackgroundWorker();
-            }
+            Reciever ??= new BackgroundWorker();
+            pinger ??= new BackgroundWorker();
+            parser ??= new BackgroundWorker();
         }
 
         private void StartAsyncCancellationWorker(BackgroundWorker worker, DoWorkEventHandler workEventHandler, string busyExceptionMessage)
@@ -1461,7 +1442,7 @@ namespace AsteriskManager
             return Call(SecondNumber ? client.SecondNumber : client.Number, client.Name);
         }
 
-        public bool Call(string NumberToCall, string name)
+        public bool Call(string NumberToCall, string name = null)
         {
             if (activeChannels.IsUserStartedCall(UserData.Number))
             {

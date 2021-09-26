@@ -11,8 +11,6 @@ namespace AsteriskManager.Manager.Actions
         public ParkAction(string channel1)
         {
             Channel1 = channel1;
-            //Channel2 = channel2;
-            //Timeout = timeout;
         }
         public ParkAction(string channel1, string channel2, string timeout)
         {
@@ -43,17 +41,27 @@ namespace AsteriskManager.Manager.Actions
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Append(string.Concat("Channel: ", Channel1, Helper.LINE_SEPARATOR));
+                var messageBuilder = new AmiMesasgeBuilder();
+                messageBuilder.Add("Channel", Channel1);
+
                 if (!string.IsNullOrEmpty(Channel2))
-                    sb.Append(string.Concat("Channel2: ", Channel2, Helper.LINE_SEPARATOR));
+                {
+                    messageBuilder.Add("Channel2", Channel2);
+                }
                 if (!string.IsNullOrEmpty(Timeout))
-                    sb.Append(string.Concat("Timeout: ", Timeout, Helper.LINE_SEPARATOR));
-                if(!string.IsNullOrEmpty(AnnounceChannel))
-                    sb.Append(string.Concat("AnnounceChannel: ", AnnounceChannel, Helper.LINE_SEPARATOR));
+                {
+                    messageBuilder.Add("Timeout", Timeout);
+                }
+                if (!string.IsNullOrEmpty(AnnounceChannel))
+                {
+                    messageBuilder.Add("AnnounceChannel", AnnounceChannel);
+                }
                 if (!string.IsNullOrEmpty(ParkingLot))
-                    sb.Append(string.Concat("Parkinglot: ", ParkingLot, Helper.LINE_SEPARATOR));
-                return sb.ToString();
+                {
+                    messageBuilder.Add("Parkinglot", ParkingLot);
+                }
+
+                return messageBuilder.ToString();
             }
         }
     }

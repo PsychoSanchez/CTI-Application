@@ -25,12 +25,16 @@ namespace AsteriskManager
                 {
                     Directory.CreateDirectory(LogFilePath);
                 }
-                file = new StreamWriter(LogFilePath + "ami"+ ".log", true);
+
+                file = new StreamWriter(LogFilePath + "ami.log", true);
                 file.WriteLine(date.ToString());
                 file.WriteLine(log);
-                file.Close();
             }
             catch (Exception)
+            {
+
+            }
+            finally
             {
                 try
                 {
@@ -39,8 +43,8 @@ namespace AsteriskManager
                 catch
                 {
                 }
+                EventSemaphore.Set();
             }
-            EventSemaphore.Set();
 
 #endif
         }

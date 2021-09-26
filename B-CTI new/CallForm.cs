@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using AsteriskManager;
 
@@ -24,7 +18,7 @@ namespace B_CTI_new
 
         private void button1_Click(object sender, EventArgs e)
         {
-            incomAMI.HangupAiringCalls(incomAMI.UserData.number);
+            // incomAMI.HangupAiringCalls(incomAMI.UserData.Number);
         }
     }
 }

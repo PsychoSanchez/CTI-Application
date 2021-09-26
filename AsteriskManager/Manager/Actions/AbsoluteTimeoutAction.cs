@@ -1,4 +1,6 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
     /// <summary>
     ///     The AbsoluteTimeoutAction sets the absolute maximum amount of time permitted for a call on a given channel.<br />
@@ -9,20 +11,11 @@
     ///     you can playback an explanatory note to the calling party (the called party will not hear that).<br />
     ///     This action corresponds the the AbsoluteTimeout command used in the dialplan.
     /// </summary>
-    public class AbsoluteTimeoutAction : ActionManager
+    public class AbsoluteTimeoutAction : ActionManager, ISerializableAMIAction
     {
-        #region AbsoluteTimeoutAction()
-
-        /// <summary>
-        ///     Creates a new empty AbsoluteTimeoutAction.
-        /// </summary>
         public AbsoluteTimeoutAction()
         {
         }
-
-        #endregion
-
-        #region AbsoluteTimeoutAction(channel, timeout)
 
         /// <summary>
         ///     Creates a new AbsoluteTimeoutAction with the given channel and timeout.
@@ -35,37 +28,18 @@
             Timeout = timeout;
         }
 
-        #endregion
 
-        #region Action
+        public string Channel { get; set; }
 
-        /// <summary>
-        ///     Get the name of this action, i.e. "AbsoluteTimeout".
-        /// </summary>
+        // timeout in seconds.
+        public int Timeout { get; set; }
+
+
         public override string Action
         {
             get { return "AbsoluteTimeout"; }
         }
 
-        #endregion
-
-        #region Channel
-
-        /// <summary>
-        ///     Get/Set the name of the channel.
-        /// </summary>
-        public string Channel { get; set; }
-
-        #endregion
-
-        #region Timeout
-
-        /// <summary>
-        ///     Get/Set the timeout (in seconds) to set.
-        /// </summary>
-        public int Timeout { get; set; }
-
- 
         public override string Parameters
         {
             get
@@ -75,6 +49,12 @@
             }
         }
 
-        #endregion
+        const string ACTION = "AbsoluteTimeout";
+        public string GetAction() => ACTION;
+        public Dictionary<string, object> GetFields() => new Dictionary<string, object>
+            {
+                {"Channel", Channel},
+                {"Timeout", Timeout}
+            };
     }
 }

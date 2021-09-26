@@ -1,5 +1,13 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
+    interface ISerializableAMIAction
+    {
+        string GetAction();
+        Dictionary<string, object> GetFields();
+    }
+
     /// <summary>
     /// Абстрактный класс для хранения информации о дейсвии, его ID и ключе прокси
     /// От него наследуются все классы и методы Action действий

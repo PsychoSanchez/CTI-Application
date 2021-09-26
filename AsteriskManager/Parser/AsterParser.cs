@@ -28,6 +28,7 @@ namespace AsteriskManager.Parser
                 switch (message)
                 {
                     case "Success":
+
                         if (_message.Contains("Message: "))
                         {
                             if (_message.Contains("Authentication"))
@@ -40,10 +41,6 @@ namespace AsteriskManager.Parser
                                 if (_message.Contains(Helper.MachineID))
                                     new OriginateEvent(_message);
                             }
-#if CONSOLEDEBUG
-                            Console.WriteLine("Success");
-                            Console.WriteLine(_message.Substring(_message.LastIndexOf("Message: ")));
-#endif
                         }
                         else if (_message.Contains("Channeltype: ") && _message.Contains("Context: ") && _message.Contains("Address-IP: "))
                         {
@@ -71,10 +68,6 @@ namespace AsteriskManager.Parser
                             if (_message.Contains(Helper.MachineID))
                                 new OriginateEvent();
                         }
-#if CONSOLEDEBUG
-                        Console.WriteLine("Error");
-                        Console.WriteLine(_message.Substring(_message.IndexOf("Message: ")));
-#endif
                         break;
                     case "Follows":
                         if (_message.Contains("Channel              Location"))
@@ -207,29 +200,29 @@ namespace AsteriskManager.Parser
         /// </summary>
         public static void ParseServerMessage()
         {
+
             ///Мигающий семафор
             startParse.WaitOne(10000);
             ///Копируем сообщения из общей памяти в локальную и делим на отдельные сообщения
             try
             {
-                var Messages = Response.Split(Helper.END_MESSAGE, StringSplitOptions.RemoveEmptyEntries);
-                Response = string.Empty;
-                List<string> Events = new List<string>();
-                List<string> Responses = new List<string>();
-                foreach (string _message in Messages)
+                var messages = Response.Split(Helper.END_MESSAGE, StringSplitOptions.RemoveEmptyEntries);
+                List<string> events = new List<string>();
+                List<string> responses = new List<string>();
+                foreach (string _message in messages)
                 {
                     if (_message.Contains("Event: "))
                     {
                         if (!_message.Contains("VarSet")/* && !(_message.Contains("RTCPReceived") && !(_message.Contains("RTCPSent")*/)
                         {
-                            Events.Add(_message);
+                            events.Add(_message);
                         }
                     }
                     if (_message.Contains("Response: "))
                     {
                         if (!_message.Contains("Pong"))
                         {
-                            Responses.Add(_message);
+                            responses.Add(_message);
                         }
                         else
                         {
@@ -250,21 +243,21 @@ namespace AsteriskManager.Parser
                 }
                 //var watch = Stopwatch.StartNew();
                 ////ParseEvent;
-                if (Events.Count > 0)
+                if (events.Count > 0)
                 {
-                    new Thread(() => ParseEvent(Events)).Start();
+                    ParseEvent(events);
                 }
                 //////ParseResponse;
-                if (Responses.Count > 0)
+                if (responses.Count > 0)
                 {
-                    new Thread(() => ParseResponse(Responses)).Start();
+                    ParseResponse(responses);
                 }
             }
-            catch 
+            catch
             {
-             
+
             }
-                
+
             //ParseEvent(Events);
             //ParseResponse(Responses);
             //watch.Stop();
