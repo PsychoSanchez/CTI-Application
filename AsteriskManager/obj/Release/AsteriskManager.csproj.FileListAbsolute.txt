@@ -1,5 +1,0 @@
-C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\AsteriskManager\bin\Release\AsteriskManager.dll
-C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\AsteriskManager\bin\Release\AsteriskManager.pdb
-C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\AsteriskManager\obj\Release\AsteriskManager.csprojResolveAssemblyReference.cache
-C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\AsteriskManager\obj\Release\AsteriskManager.dll
-C:\Users\Alexander\Desktop\Work\B-CTI 0.3.1\AsteriskManager\obj\Release\AsteriskManager.pdb
