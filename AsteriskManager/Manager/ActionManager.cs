@@ -2,9 +2,10 @@
 
 namespace AsteriskManager.Manager.Actions
 {
-    interface ISerializableAMIAction
+    public interface ISerializableAmiAction
     {
-        string GetAction();
+        string GetActionId();
+        string GetActionName();
         Dictionary<string, object> GetFields();
     }
 
@@ -12,30 +13,25 @@ namespace AsteriskManager.Manager.Actions
     /// Абстрактный класс для хранения информации о дейсвии, его ID и ключе прокси
     /// От него наследуются все классы и методы Action действий
     /// </summary>
-    public abstract class ActionManager
+    public abstract class BaseAmiAction : ISerializableAmiAction
     {
-        private string _actionID;
-        private string _ProxyKey;
-
-        public abstract string Action { get; }
-        public abstract string Parameters { get; }
-
-        public string ActionID
+        private readonly string actionId;
+        private readonly string action;
+        public BaseAmiAction(string actionId, string action)
         {
-            get { return this._actionID; }
-            set { this._actionID = value; }
+            this.actionId = actionId;
+            this.action = actionId;
         }
 
-        public virtual string ProxyKey
+        public BaseAmiAction(string action)
         {
-            get { return this._ProxyKey; }
-            set { this._ProxyKey = value; }
+            this.actionId = Helper.MachineID;
+            this.action = actionId;
         }
 
-        public override string ToString()
-        {
-            return base.ToString();
-        }
+        public virtual string GetActionId() => actionId;
+        public virtual string GetActionName() => action;
 
+        public abstract Dictionary<string, object> GetFields();
     }
 }

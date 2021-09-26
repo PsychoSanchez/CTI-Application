@@ -1,25 +1,13 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class ParkedCallsAction : ActionManager
+    class ParkedCallsAction : BaseAmiAction
     {
-        public ParkedCallsAction()
+        public ParkedCallsAction() : base("ParkedCalls")
         {
-
-        }
-        public override string Action
-        {
-            get
-            {
-                return "ParkedCalls";
-            }
         }
 
-        public override string Parameters
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
+        public override Dictionary<string, object> GetFields() => new();
     }
 }

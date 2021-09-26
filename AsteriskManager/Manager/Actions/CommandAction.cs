@@ -1,30 +1,17 @@
-﻿namespace AsteriskManager.Manager.Actions
-{
-    class CommandAction : ActionManager
-    {
-        public CommandAction(string command)
-        {
-            Command = command;
-        }
-        public string Command { get; set; }
-        public override string Action
-        {
-            get
-            {
-                return "Command";
-            }
-        }
+﻿using System.Collections.Generic;
 
-        public override string Parameters
+namespace AsteriskManager.Manager.Actions
+{
+    class CommandAction : BaseAmiAction
+    {
+        const string ACTION = "Command";
+        public CommandAction(string actionId) : base(actionId, ACTION) { }
+
+        public string Command;
+
+        public override Dictionary<string, object> GetFields() => new()
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(Command))
-                {
-                    return string.Concat("Command: ", Command, Helper.LINE_SEPARATOR);
-                }
-                return null;
-            }
-        }
+            ["Command"] = Command
+        };
     }
 }

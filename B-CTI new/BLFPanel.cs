@@ -1951,7 +1951,7 @@ namespace BCTI
                     AMI.SIPADDHEADER = settings.Integration.SIPADDHEADER;
                     AMI.CallerID = settings.Integration.CallerID;
                     AMI.RecvLogPath = settings.Logs.AmiLogFolder;
-                    AMI.bLogEnabled = settings.Logs.bAmiLogEnabled;
+                    AMI.IsLogEnabled = settings.Logs.bAmiLogEnabled;
 #if LOG
                     if (AMI.UserData.Status != null)
                     {
@@ -3158,7 +3158,7 @@ namespace BCTI
             {
                 AMI.SIPADDHEADER = settings.Integration.SIPADDHEADER;
                 AMI.CallerID = settings.Integration.CallerID;
-                AMI.bLogEnabled = settings.Logs.bAmiLogEnabled;
+                AMI.IsLogEnabled = settings.Logs.bAmiLogEnabled;
                 AMI.RecvLogPath = settings.Logs.AmiLogFolder;
             }
             SettingsForm.settings.CommonSettings.BlfLocation = this.DesktopLocation;

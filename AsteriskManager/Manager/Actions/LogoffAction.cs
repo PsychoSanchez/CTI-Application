@@ -1,24 +1,13 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class LogoffAction : ActionManager
+    class LogoffAction : BaseAmiAction
     {
-        /// <summary>
-        /// Возвращает название действия
-        /// </summary>
-        public override string Action
+        public LogoffAction() : base("Logoff")
         {
-            get
-            {
-                return "Logoff";
-            }
         }
 
-        public override string Parameters
-        {
-            get
-            {
-                return "";
-            }
-        }
+        public override Dictionary<string, object> GetFields() => new();
     }
 }

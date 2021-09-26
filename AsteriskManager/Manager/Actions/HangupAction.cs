@@ -1,38 +1,18 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class HangupAction : ActionManager
+    class HangupAction : BaseAmiAction
     {
-        public string Channel { get; set; }
-        /// <summary>
-        /// Конструктор по умолчанию
-        /// </summary>
-        public HangupAction()
+        const string ACTION = "Hangup";
+        public string Channel;
+        public HangupAction(string actionId) : base(actionId, ACTION)
         {
-        }
-        /// <summary>
-        /// Создает Hangup Action с названием канала, который нужно закрыть
-        /// </summary>
-        /// <param name="channel"></param>
-        public HangupAction(string channel)
-        {
-            Channel = channel;
-        }
-        public override string Action
-        {
-            get
-            {
-                return "Hangup";
-            }
         }
 
-        public override string Parameters
+        public override Dictionary<string, object> GetFields() => new()
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(Channel))
-                    return string.Concat("Channel: ", Channel, Helper.LINE_SEPARATOR);
-                return null;
-            }
-        }
+            ["Channel"] = Channel
+        };
     }
 }

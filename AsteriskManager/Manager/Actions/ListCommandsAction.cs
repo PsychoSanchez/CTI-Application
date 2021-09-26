@@ -1,21 +1,14 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class ListCommandsAction : ActionManager
+    class ListCommandsAction : BaseAmiAction
     {
-        public override string Action
+        public ListCommandsAction() : base("ListCommands")
         {
-            get
-            {
-                return "ListCommands";
-            }
         }
 
-        public override string Parameters
-        {
-            get
-            {
-                return null;
-            }
-        }
+        private Dictionary<string, object> emptyParams = new();
+        public override Dictionary<string, object> GetFields() => emptyParams;
     }
 }

@@ -1,70 +1,38 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
+using AsteriskManager.Utils;
 
 namespace AsteriskManager.Manager.Actions
 {
-    public class LoginAction : ActionManager
+    public class LoginAction : BaseAmiAction
     {
-        public string _UserName { get; set; }
-        public string _PassWord { get; set; }
-        public string _AuthType { get; set; }
-        public string _Key { get; set; }
-        public string _Events { get; set; }
+        public string UserName = string.Empty;
+        public string PassWord = string.Empty;
+        public string AuthType = string.Empty;
+        public string Key = string.Empty;
+        public string Events = string.Empty;
 
-        public LoginAction()
+        const string ACTION_NAME = "Login";
+
+        public LoginAction(string actionId) : base(actionId, ACTION_NAME)
         {
         }
-        public LoginAction(string username, string pwd)
+        public LoginAction() : base(ACTION_NAME)
         {
-            _UserName = username;
-            _PassWord = pwd;
-            _AuthType = string.Empty;
-            _Key = string.Empty;
-            _Events = string.Empty;
-        }
-        public LoginAction(string username, string AuthType, string events)
-        {
-            _UserName = username;
-            _AuthType = AuthType;
-            _Key = string.Empty;
-            _PassWord = string.Empty;
-            _Events = events;
-
-        }
-        public LoginAction(string username, string AuthType, string key, string events)
-        {
-            _UserName = username;
-            _AuthType = AuthType;
-            _Key = key;
-            _Events = events;
-            _PassWord = string.Empty;
-
         }
 
-        public override string Action
+        public override Dictionary<string, object> GetFields()
         {
-            get
+            Dictionary<string, object> fields = new()
             {
-                return "Login";
-            }
-        }
-        public override string Parameters
-        {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
+                ["UserName"] = UserName,
+                ["Secret"] = PassWord,
+                ["AuthType"] = AuthType,
+                ["Key"] = Key,
+                ["Events"] = Events,
+            };
 
-                if (!string.IsNullOrEmpty(_UserName))
-                    sb.Append(string.Concat("UserName: ", _UserName, Helper.LINE_SEPARATOR));
-                if (!string.IsNullOrEmpty(_PassWord))
-                    sb.Append(string.Concat("Secret: ", _PassWord, Helper.LINE_SEPARATOR));
-                if (!string.IsNullOrEmpty(_AuthType))
-                    sb.Append(string.Concat("AuthType: ", _AuthType, Helper.LINE_SEPARATOR));
-                if (!string.IsNullOrEmpty(_Key))
-                    sb.Append(string.Concat("Key: ", _Key, Helper.LINE_SEPARATOR));          
-                if (!string.IsNullOrEmpty(_Events))
-                    sb.Append(string.Concat("Events: ", _Events, Helper.LINE_SEPARATOR));
-                return sb.ToString();
-            }
+            return AsteriskManagerUtils.OmitNullOrEmptyStrings(fields);
         }
     }
 }

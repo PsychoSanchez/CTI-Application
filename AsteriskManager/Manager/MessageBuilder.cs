@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using AsteriskManager.Manager.Actions;
 using AsteriskManager.Parser;
 
 namespace AsteriskManager
@@ -56,18 +57,26 @@ namespace AsteriskManager
         }
     }
 
-    class AmiMesasgeBuilder
+    class AmiActionMesasgeBuilder
     {
+        const string ACTION_KEY = "Action";
+        const string ACTION_ID_KEY = "ActionID";
         private IAmiMessageBuildingStrategy strategy = new ActiveAmiMessageBuildingStrategy();
 
-        public AmiMesasgeBuilder Add<T>(string key, T value)
+        public AmiActionMesasgeBuilder(ISerializableAmiAction action)
+        {
+            strategy.Add(ACTION_KEY, action.GetActionName());
+            strategy.Add(ACTION_ID_KEY, action.GetActionId());
+        }
+
+        public AmiActionMesasgeBuilder Add<T>(string key, T value)
         {
             strategy.Add(key, value);
 
             return this;
         }
 
-        public AmiMesasgeBuilder AddFields(Dictionary<string, object> fields)
+        public AmiActionMesasgeBuilder AddFields(Dictionary<string, object> fields)
         {
             foreach (var item in fields)
             {

@@ -85,9 +85,5 @@ namespace AsteriskManager
         public string Timeout { get; set; }
         public string CallerIDNum { get; set; }
         public string CallerIDName { get; set; }
-        public ParkedCallsData()
-        {
-
-        }
     }
 }

@@ -63,7 +63,7 @@ namespace AsteriskManager
                 {
                     BLFStatus = ClientStatus.Unreacheble;
                 }
-                else if(_status.Contains("Hold"))
+                else if (_status.Contains("Hold"))
                 {
                     BLFStatus = ClientStatus.Hold;
                 }
@@ -87,7 +87,7 @@ namespace AsteriskManager
                 return Number;
         }
 
-        public string getchannel()
+        public string GetChannel()
         {
             return Protocol + "/" + Number;
         }
