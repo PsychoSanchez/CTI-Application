@@ -8,13 +8,13 @@ namespace AsteriskManager.Connect
     class SocketConnection
     {
         public Socket Socket { get; set; }
-        public TcpClient tcpClient { get; set; }
-        private enum connectionType
+        public TcpClient TcpClient { get; set; }
+        private enum ConnectionType
         {
             DefaultSocket = 0,
             TcpSocket = 1
         }
-        private connectionType CurrectConnction;
+        private ConnectionType connectedWith;
         #region Конструкторы
         /// <summary>
         /// Конструктор по умолчанию, используется с функциями и переменными старой библиотеки
@@ -23,12 +23,12 @@ namespace AsteriskManager.Connect
         public SocketConnection()
         {
             Socket = this.GetSocket();
-            CurrectConnction = connectionType.DefaultSocket;
+            connectedWith = ConnectionType.DefaultSocket;
         }
         public SocketConnection(Socket nSocket)
         {
             Socket = nSocket;
-            CurrectConnction = connectionType.DefaultSocket;
+            connectedWith = ConnectionType.DefaultSocket;
         }
 
         /// <summary>
@@ -40,8 +40,8 @@ namespace AsteriskManager.Connect
         public SocketConnection(IPEndPoint ipEnd)
         {
             //clientSocket = this.GetSocket();
-            tcpClient = new TcpClient(ipEnd);
-            CurrectConnction = connectionType.TcpSocket;
+            TcpClient = new TcpClient(ipEnd);
+            connectedWith = ConnectionType.TcpSocket;
         }
         /// <summary>
         /// 
@@ -51,8 +51,8 @@ namespace AsteriskManager.Connect
         public SocketConnection(string host, int port)
         {
             //clientSocket = this.GetSocket();
-            tcpClient = new TcpClient(host, port);
-            CurrectConnction = connectionType.TcpSocket;
+            TcpClient = new TcpClient(host, port);
+            connectedWith = ConnectionType.TcpSocket;
         }
         /// <summary>
         /// Конструктор 2 для использования с tcp
@@ -62,8 +62,8 @@ namespace AsteriskManager.Connect
         public SocketConnection(TcpClient nClient)
         {
             //clientSocket = this.GetSocket();
-            tcpClient = nClient;
-            CurrectConnction = connectionType.TcpSocket;
+            TcpClient = nClient;
+            connectedWith = ConnectionType.TcpSocket;
         }
 
         #endregion
@@ -73,7 +73,7 @@ namespace AsteriskManager.Connect
         /// <returns></returns>
         public int GetConnectionType()
         {
-            return (Int32)CurrectConnction;
+            return (Int32)connectedWith;
         }
         /// <summary>
         /// Функция закрывающая подключение к серверу, а также освобождает все ресурсы используемые ей
@@ -82,9 +82,9 @@ namespace AsteriskManager.Connect
         {
             try
             {
-                tcpClient.Client.Shutdown(SocketShutdown.Both);
-                tcpClient.Client.Close();
-                tcpClient.Close();
+                TcpClient.Client.Shutdown(SocketShutdown.Both);
+                TcpClient.Client.Close();
+                TcpClient.Close();
                 return true;
             }
             catch (SocketException)
@@ -100,7 +100,7 @@ namespace AsteriskManager.Connect
         /// <returns></returns>
         public bool IsTcpConnected()
         {
-            return tcpClient.Connected;
+            return TcpClient.Connected;
         }
         /// <summary>
         /// Возвращает сам сокет со всей информацией
@@ -108,7 +108,7 @@ namespace AsteriskManager.Connect
         /// <returns></returns>
         public TcpClient TcpClientSocket()
         {
-            return tcpClient;
+            return TcpClient;
         }
         /// <summary>
         /// 2 функции с информацией о сетевом подключении локального компьютера
@@ -117,11 +117,11 @@ namespace AsteriskManager.Connect
         #region LocalInfo
         public IPAddress LocalAdress()
         {
-            return ((IPEndPoint)(tcpClient.Client.LocalEndPoint)).Address;
+            return ((IPEndPoint)(TcpClient.Client.LocalEndPoint)).Address;
         }
         public int LocalPort()
         {
-            return ((IPEndPoint)(tcpClient.Client.LocalEndPoint)).Port;
+            return ((IPEndPoint)(TcpClient.Client.LocalEndPoint)).Port;
         }
         #endregion
         /// <summary>
@@ -131,11 +131,11 @@ namespace AsteriskManager.Connect
         #region RemoteServerInfo
         public IPAddress RemoteAdress()
         {
-            return ((IPEndPoint)(tcpClient.Client.RemoteEndPoint)).Address;
+            return ((IPEndPoint)(TcpClient.Client.RemoteEndPoint)).Address;
         }
         public int RemotePort()
         {
-            return ((IPEndPoint)(tcpClient.Client.RemoteEndPoint)).Port;
+            return ((IPEndPoint)(TcpClient.Client.RemoteEndPoint)).Port;
         }
         #endregion
         #endregion

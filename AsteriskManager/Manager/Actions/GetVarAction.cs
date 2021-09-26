@@ -1,58 +1,35 @@
-﻿namespace AsteriskManager.Manager.Actions
-{
-    class GetVarAction : ActionManager
-    {
-        /// <summary>
-        /// Пустой конструктор по умолчанию
-        /// </summary>
-        public GetVarAction()
-        {
+﻿using System.Collections.Generic;
 
-        }
-        /// <summary>
-        /// Конаструктор для передачи серверу глобальной переменной
-        /// </summary>
-        /// <param name="variable"></param>
-        public GetVarAction(string variable)
+namespace AsteriskManager.Manager.Actions
+{
+    class GetVarAction : BaseAmiAction
+    {
+        const string ACTION = "GetVar";
+
+        public GetVarAction(string actionId) : base(actionId, ACTION)
         {
-            Variable = variable;
         }
-        /// <summary>
-        /// Конструктор для передачи серверу переменной в локальном канале
-        /// </summary>
-        /// <param name="variable"></param>
-        /// <param name="channel"></param>
-        public GetVarAction(string variable, string channel)
-        {
-            Variable = variable;
-            Channel = channel;
-        }
+
         public string Variable { get; set; }
         public string Channel { get; set; }
-        public override string Action
+        public override Dictionary<string, object> GetFields()
         {
-            get
+            var fields = new Dictionary<string, object>();
+            if (string.IsNullOrEmpty(Variable))
             {
-                return "GetVar";
+                return fields;
             }
-        }
 
-        public override string Parameters
-        {
-            get
+            fields["Variable"] = Variable;
+
+            if (string.IsNullOrEmpty(Channel))
             {
-                string Parameters;
-                if (!string.IsNullOrEmpty(Variable))
-                {
-                    Parameters = "Variable: " + Variable + Helper.LINE_SEPARATOR;
-                    if (!string.IsNullOrEmpty(Channel))
-                    {
-                        return string.Concat(Parameters, "Channel: ", Channel, Helper.LINE_SEPARATOR);
-                    }
-                    return Parameters;
-                }
-                return null;
+                return fields;
             }
+
+            fields["Channel"] = Channel;
+
+            return fields;
         }
     }
 }

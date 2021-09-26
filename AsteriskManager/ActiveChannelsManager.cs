@@ -264,12 +264,7 @@ namespace AsteriskManager
                 ActiveChanSemaphore.Set();
             }
         }
-        /// <summary>
-        /// Функция поиска канала к которому подключен наш номер
-        /// </summary>
-        /// <param name="CallerIDNum"></param>
-        /// <returns></returns>
-      
+
         /// <summary>
         /// Находит полную информацию о канале по его ID
         /// </summary>

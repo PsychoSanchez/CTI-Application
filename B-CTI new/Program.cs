@@ -4,9 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using BCTI.DialogBoxes;
-using Ionic.Zip;
 using SendFileTo;
-using System.IO;
 
 namespace BCTI
 {
@@ -118,23 +116,23 @@ namespace BCTI
                 switch (BMessageBox.Show(errMessage + "Unhandled exception:" + ex.Message, "Unhandled Exception", BMessageBoxButtons.AbortRetryIgnore))
                 {
                     case DialogResult.Abort:
-                        using (ZipFile zip = new ZipFile())
-                        {
-                            try
-                            {
-                                zip.AddSelectedFiles("*", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\" + DateTime.Today.ToShortDateString() + "\\", string.Empty, false);
-                                if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\"))
-                                {
-                                    Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti");
-                                    Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log");
-                                }
-                                zip.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\" + savefile);
-                            }
-                            catch (Exception exe)
-                            {
-                                EventLogs.WriteLog("Error occupied while zipping folder", exe.Message);
-                            }
-                        }
+                        // using (ZipFile zip = new ZipFile())
+                        // {
+                        //     try
+                        //     {
+                        //         zip.AddSelectedFiles("*", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\" + DateTime.Today.ToShortDateString() + "\\", string.Empty, false);
+                        //         if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\"))
+                        //         {
+                        //             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti");
+                        //             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log");
+                        //         }
+                        //         zip.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\" + savefile);
+                        //     }
+                        //     catch (Exception exe)
+                        //     {
+                        //         EventLogs.WriteLog("Error occupied while zipping folder", exe.Message);
+                        //     }
+                        // }
                         try
                         {
                             MAPI mapi = new MAPI();
@@ -153,20 +151,20 @@ namespace BCTI
                         }
                         break;
                     case DialogResult.Retry:
-                        using (ZipFile zip = new ZipFile())
-                        {
-                            zip.AddSelectedFiles("*", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\" + DateTime.Today.ToShortDateString() + "\\", string.Empty, false);
-                            zip.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\" + savefile);
-                        }
+                        // using (ZipFile zip = new ZipFile())
+                        // {
+                        //     zip.AddSelectedFiles("*", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\" + DateTime.Today.ToShortDateString() + "\\", string.Empty, false);
+                        //     zip.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\" + savefile);
+                        // }
                         break;
                     case DialogResult.Ignore:
                         break;
                     default:
-                        using (ZipFile zip = new ZipFile())
-                        {
-                            zip.AddSelectedFiles("*", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\" + DateTime.Today.ToShortDateString() + "\\", string.Empty, false);
-                            zip.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\" + savefile);
-                        }
+                        // using (ZipFile zip = new ZipFile())
+                        // {
+                        //     zip.AddSelectedFiles("*", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\" + DateTime.Today.ToShortDateString() + "\\", string.Empty, false);
+                        //     zip.Save(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\B-Cti\\log\\" + savefile);
+                        // }
                         break;
                 }
                 ///Журнал собыий виндоус. Полезно для сисадминов. И дебага без файлов.

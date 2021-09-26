@@ -4,8 +4,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
 using AsteriskManager;
-using OfficeOpenXml;
 using BCTI.DialogBoxes;
+using OfficeOpenXml.Core.ExcelPackage;
 
 namespace BCTI
 {
@@ -56,22 +56,22 @@ namespace BCTI
                 {
                     // get the first worksheet in the workbook
                     ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
-                    if (worksheet.Cells["A1"].Value != null)
+                    if (worksheet.Cell(1, 1).Value != null)
                     {
                         temp = new ClientsData();
-                        temp.Name = worksheet.Cells["A1"].Value.ToString();
-                        temp.Number = worksheet.Cells["B1"].Value.ToString();
-                        temp.organisation = worksheet.Cells["C1"].Value.ToString();
+                        temp.Name = worksheet.Cell(1, 1).Value.ToString();
+                        temp.Number = worksheet.Cell(1, 2).Value.ToString();
+                        temp.organisation = worksheet.Cell(1, 3).Value.ToString();
                         if (BLF.AMI == null) return;
                         InfoLabel.Show();
                         AutoCall.Show();
                         NextButton.Show();
                         BLF.RaiseCall(temp, true);
                         i = 2;
-                        if (worksheet.Cells["A2"].Value != null)
+                        if (worksheet.Cell(2, 1).Value != null)
                         {
-                            this.BeginInvoke((MethodInvoker)(() => InfoLabel.Text = "Следующий контакт\r\nИмя: " + worksheet.Cells["A2"].Value.ToString() + "\r\n" + "Номер: " + worksheet.Cells["B2"].Value.ToString() + "\r\n" +
-                               "Организация: " + worksheet.Cells["C2"].Value.ToString()));
+                            this.BeginInvoke((MethodInvoker)(() => InfoLabel.Text = "Следующий контакт\r\nИмя: " + worksheet.Cell(2, 2).Value.ToString() + "\r\n" + "Номер: " + worksheet.Cell(2, 2).Value.ToString() + "\r\n" +
+                               "Организация: " + worksheet.Cell(2, 3).Value.ToString()));
                         }
                         else InfoLabel.Hide();
                         EventManager.ConversationEnd += EventManager_ConversationEnd;
@@ -96,21 +96,21 @@ namespace BCTI
                     {
                         // get the first worksheet in the workbook
                         ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
-                        if (worksheet.Cells["A" + i].Value != null)
+                        if (worksheet.Cell(i, 1).Value != null)
                         {
                             temp = new ClientsData();
-                            temp.Name = worksheet.Cells["A" + i].Value.ToString();
-                            temp.Number = worksheet.Cells["B" + i].Value.ToString();
-                            temp.organisation = worksheet.Cells["C" + i].Value.ToString();
+                            temp.Name = worksheet.Cell(i, 1).Value.ToString();
+                            temp.Number = worksheet.Cell(i, 2).Value.ToString();
+                            temp.organisation = worksheet.Cell(i, 3).Value.ToString();
                             if (BLF.AMI == null) return;
                             BLF.RaiseCall(temp, true);
-                            if (worksheet.Cells["A" + (i + 1)].Value != null)
+                            if (worksheet.Cell((i + 1), 1).Value != null)
                             {
                                 try
                                 {
 
-                                    InfoLabel.BeginInvoke((MethodInvoker)(() => InfoLabel.Text = "Следующий контакт\r\nИмя: " + worksheet.Cells["A" + (i + 1)].Value.ToString() + "\r\n" + "Номер: " + worksheet.Cells["B" + (i + 1)].Value.ToString() + "\r\n" +
-                                        "Организация: " + worksheet.Cells["C" + (i + 1)].Value.ToString()));
+                                    InfoLabel.BeginInvoke((MethodInvoker)(() => InfoLabel.Text = "Следующий контакт\r\nИмя: " + worksheet.Cell((i + 1), 1).Value.ToString() + "\r\n" + "Номер: " + worksheet.Cell((i + 1), 2).Value.ToString() + "\r\n" +
+                                        "Организация: " + worksheet.Cell((i + 1), 3).Value.ToString()));
                                 }
                                 catch (Exception ex)
                                 {
@@ -227,21 +227,21 @@ namespace BCTI
                 {
                     // get the first worksheet in the workbook
                     ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
-                    if (worksheet.Cells["A" + i].Value != null)
+                    if (worksheet.Cell(i, 1).Value != null)
                     {
                         temp = new ClientsData();
-                        temp.Name = worksheet.Cells["A" + i].Value.ToString();
-                        temp.Number = worksheet.Cells["B" + i].Value.ToString();
-                        temp.organisation = worksheet.Cells["C" + i].Value.ToString();
+                        temp.Name = worksheet.Cell(i, 1).Value.ToString();
+                        temp.Number = worksheet.Cell(i, 2).Value.ToString();
+                        temp.organisation = worksheet.Cell(i, 3).Value.ToString();
                         if (BLF.AMI == null) return;
                         BLF.RaiseCall(temp, true);
                         try
                         {
 
-                            if (worksheet.Cells["A" + (i + 1)].Value != null)
+                            if (worksheet.Cell((i + 1), 1).Value != null)
                             {
-                                InfoLabel.Invoke((MethodInvoker)(() => InfoLabel.Text = "Следующий контакт\r\nИмя: " + worksheet.Cells["A" + (i + 1)].Value.ToString() + "\r\n" + "Номер: " + worksheet.Cells["B" + (i + 1)].Value.ToString() + "\r\n" +
-                                    "Организация: " + worksheet.Cells["C" + (i + 1)].Value.ToString()));
+                                InfoLabel.Invoke((MethodInvoker)(() => InfoLabel.Text = "Следующий контакт\r\nИмя: " + worksheet.Cell((i + 1), 1).Value.ToString() + "\r\n" + "Номер: " + worksheet.Cell((i + 1), 2).Value.ToString() + "\r\n" +
+                                    "Организация: " + worksheet.Cell((i + 1), 3).Value.ToString()));
                             }
                             else InfoLabel.Invoke((MethodInvoker)(() => InfoLabel.Hide()));
                         }

@@ -1,38 +1,23 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+using AsteriskManager.Utils;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class StatusAction : ActionManager
+    class StatusAction : BaseAmiAction
     {
-        public string Channel { get; set; }
-        /// <summary>
-        /// Конструктор по умолчанию
-        /// </summary>
-        public StatusAction()
+        public string Channel;
+
+        public StatusAction() : base("Status")
         {
-        }
-        /// <summary>
-        /// Создает Hangup Action с названием канала, который нужно закрыть
-        /// </summary>
-        /// <param name="channel"></param>
-        public StatusAction(string channel)
-        {
-            Channel = channel;
-        }
-        public override string Action
-        {
-            get
-            {
-                return "Status";
-            }
         }
 
-        public override string Parameters
+        public StatusAction(string actionId) : base(actionId, "Status")
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(Channel))
-                    return string.Concat("Channel: ", Channel, Helper.LINE_SEPARATOR);
-                return null;
-            }
         }
+
+        public override Dictionary<string, object> GetFields() => AsteriskManagerUtils.OmitNullOrEmptyStrings(new()
+        {
+            ["Channel"] = Channel
+        });
     }
 }

@@ -7,10 +7,10 @@ using System.IO;
 using System.Windows.Forms;
 using AsteriskManager;
 using System.Threading;
-using OfficeOpenXml;
 using BCTI.DialogBoxes;
 using BCTI.Settings;
 using BCTI.Helpers;
+using OfficeOpenXml.Core.ExcelPackage;
 
 namespace BCTI
 {
@@ -152,7 +152,7 @@ namespace BCTI
         {
             if (BookOfContacts.Count <= 0) return;
             matches = 0;
-           
+
             if (Initialize)
             {
                 this.Invoke((MethodInvoker)delegate
@@ -677,33 +677,47 @@ namespace BCTI
                             if (xlPackage.Workbook.Worksheets.Count <= 0)
                                 xlPackage.Workbook.Worksheets.Add("Номера");
                             ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
-                            worksheet.Cells["A1"].Value = "Имя";
-                            worksheet.Cells["B1"].Value = "Префикс";
-                            worksheet.Cells["C1"].Value = "Номер";
-                            worksheet.Cells["D1"].Value = "Второй номер (если есть)";
-                            worksheet.Cells["E1"].Value = "Должность";
-                            worksheet.Cells["F1"].Value = "Адрес";
-                            worksheet.Cells["G1"].Value = "Организация";
-                            worksheet.Cells["H1"].Value = "Адрес электронной почты";
-                            worksheet.Cells["I1"].Value = "День рождения";
-                            worksheet.Cells["J1"].Value = "Заметки";
+                            var headers = new[] {
+                                "Имя",
+                                "Префикс",
+                                "Номер",
+                                "Второй номер (если есть)",
+                                "Должность",
+                                "Адрес",
+                                "Организация",
+                                "Адрес электронной почты",
+                                "День рождения",
+                                "Заметки"
+                            };
+
+                            for (int index = 0; index < headers.Length; index++)
+                            {
+                                var colInex = index + 1;
+                                worksheet.Cell(1, colInex).Value = headers[index];
+                            }
+
                             for (int i = 0; i < BookOfContacts.Count; i++)
                             {
-                                worksheet.Cells["A" + (i + 2)].Value = BookOfContacts[i]._Client.Name;
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.Prefix)) worksheet.Cells["B" + (i + 2)].Value = BookOfContacts[i]._Client.Prefix;
-                                worksheet.Cells["C" + (i + 2)].Value = BookOfContacts[i]._Client.Number;
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.SecondNumber)) worksheet.Cells["D" + (i + 2)].Value = BookOfContacts[i]._Client.SecondNumber;
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.position)) worksheet.Cells["E" + (i + 2)].Value = BookOfContacts[i]._Client.position;
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.site)) worksheet.Cells["F" + (i + 2)].Value = BookOfContacts[i]._Client.site;
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.organisation)) worksheet.Cells["G" + (i + 2)].Value = BookOfContacts[i]._Client.organisation;
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.email)) worksheet.Cells["H" + (i + 2)].Value = BookOfContacts[i]._Client.email;
+                                var rowIndex = (i + 2);
+                                worksheet.Cell(rowIndex, 1).Value = BookOfContacts[i]._Client.Name;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.Prefix))
+                                {
+                                    worksheet.Cell(rowIndex, 2).Value = BookOfContacts[i]._Client.Prefix;
+                                }
+                                worksheet.Cell(rowIndex, 3).Value = BookOfContacts[i]._Client.Number;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.SecondNumber)) worksheet.Cell(rowIndex, 4).Value = BookOfContacts[i]._Client.SecondNumber;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.position)) worksheet.Cell(rowIndex, 5).Value = BookOfContacts[i]._Client.position;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.site)) worksheet.Cell(rowIndex, 6).Value = BookOfContacts[i]._Client.site;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.organisation)) worksheet.Cell(rowIndex, 7).Value = BookOfContacts[i]._Client.organisation;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.email)) worksheet.Cell(rowIndex, 8).Value = BookOfContacts[i]._Client.email;
                                 if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.birthday.ToString()))
-                                    worksheet.Cells["I" + (i + 2)].Value = (BookOfContacts[i]._Client.birthday.Day % 10 == BookOfContacts[i]._Client.birthday.Day ? "0" + BookOfContacts[i]._Client.birthday.Day.ToString() : BookOfContacts[i]._Client.birthday.Day.ToString()) + "." +
+                                    worksheet.Cell(rowIndex, 9).Value = (BookOfContacts[i]._Client.birthday.Day % 10 == BookOfContacts[i]._Client.birthday.Day ? "0" + BookOfContacts[i]._Client.birthday.Day.ToString() : BookOfContacts[i]._Client.birthday.Day.ToString()) + "." +
                                         (BookOfContacts[i]._Client.birthday.Month % 10 == BookOfContacts[i]._Client.birthday.Month ? "0" + BookOfContacts[i]._Client.birthday.Month.ToString() : BookOfContacts[i]._Client.birthday.Month.ToString()) + "." +
                                         BookOfContacts[i]._Client.birthday.Year.ToString();
-                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.note)) worksheet.Cells["J" + (i + 2)].Value = BookOfContacts[i]._Client.note;
+                                if (!string.IsNullOrEmpty(BookOfContacts[i]._Client.note)) worksheet.Cell(rowIndex, 10).Value = BookOfContacts[i]._Client.note;
                             }
-                            xlPackage.SaveAs(new FileInfo(saveFileDialog.FileName));
+
+                            xlPackage.Save();
                             xlPackage.Dispose();
                         }
                     }
@@ -732,22 +746,22 @@ namespace BCTI
                     int count = 2;
                     NoContactsLabel.Text = "Обновление списка контактов";
                     NoContactsLabel.Show();
-                    while (worksheet.Cells["A" + count].Value != null)
+                    while (worksheet.Cell(count, 1).Value != null)
                     {
 
                         ClientsData temp = new ClientsData();
-                        temp.Name = worksheet.Cells["A" + count].Value.ToString();
-                        if (worksheet.Cells["B" + count].Value != null) temp.Prefix = worksheet.Cells["B" + count].Value.ToString();
-                        if (worksheet.Cells["C" + count].Value != null) temp.Number = worksheet.Cells["C" + count].Value.ToString();
+                        temp.Name = worksheet.Cell(count, 1).Value.ToString();
+                        if (worksheet.Cell(count, 2).Value != null) temp.Prefix = worksheet.Cell(count, 2).Value.ToString();
+                        if (worksheet.Cell(count, 3).Value != null) temp.Number = worksheet.Cell(count, 3).Value.ToString();
                         else temp.Number = string.Empty;
-                        if (worksheet.Cells["D" + count].Value != null) temp.SecondNumber = worksheet.Cells["D" + count].Value.ToString();
+                        if (worksheet.Cell(count, 4).Value != null) temp.SecondNumber = worksheet.Cell(count, 4).Value.ToString();
                         else temp.SecondNumber = string.Empty;
-                        if (worksheet.Cells["E" + count].Value != null) temp.position = worksheet.Cells["E" + count].Value.ToString();
-                        if (worksheet.Cells["F" + count].Value != null) temp.site = worksheet.Cells["F" + count].Value.ToString();
-                        if (worksheet.Cells["G" + count].Value != null) temp.organisation = worksheet.Cells["G" + count].Value.ToString();
-                        if (worksheet.Cells["H" + count].Value != null) temp.email = worksheet.Cells["H" + count].Value.ToString();
-                        if (worksheet.Cells["I" + count].Value != null) temp.birthday = DateTime.Parse(worksheet.Cells["I" + count].Value.ToString());
-                        if (worksheet.Cells["J" + count].Value != null) temp.note = worksheet.Cells["J" + count].Value.ToString();
+                        if (worksheet.Cell(count, 5).Value != null) temp.position = worksheet.Cell(count, 5).Value.ToString();
+                        if (worksheet.Cell(count, 6).Value != null) temp.site = worksheet.Cell(count, 6).Value.ToString();
+                        if (worksheet.Cell(count, 7).Value != null) temp.organisation = worksheet.Cell(count, 7).Value.ToString();
+                        if (worksheet.Cell(count, 8).Value != null) temp.email = worksheet.Cell(count, 8).Value.ToString();
+                        if (worksheet.Cell(count, 9).Value != null) temp.birthday = DateTime.Parse(worksheet.Cell(count, 9).Value.ToString());
+                        if (worksheet.Cell(count, 10).Value != null) temp.note = worksheet.Cell(count, 10).Value.ToString();
                         bool match = false;
                         count++;
                         for (int i = 0; i < BookOfContacts.Count; i++)

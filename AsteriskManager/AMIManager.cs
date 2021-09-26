@@ -12,24 +12,20 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.ComponentModel;
-using System.Security.Cryptography;
 using System.IO;
+using AsteriskManager.Utils;
 
 namespace AsteriskManager
 {
     public class AMIManager
     {
-
         private ActiveChannelManager activeChannels = new ActiveChannelManager();
 
         #region Функции для работы с массивами данных
         private DialData TryGetDialChannelInfoAndUpdateDial(DialData dial)
         {
             ChannelData channel = activeChannels.FindChInfoByChID(dial.ChannelID);
-            if (channel == null)
-            {
-                channel = activeChannels.FindChInfoByChID(dial.DestinationID);
-            }
+            channel ??= activeChannels.FindChInfoByChID(dial.DestinationID);
 
             if (channel == null)
             {
@@ -49,7 +45,7 @@ namespace AsteriskManager
             {
                 ChannelData channel = activeChannels.GetChannelByCallerNumbers(connectedLineNum, UserData.Number);
 
-                return channel != null ? channel : FindConnectedChannel(connectedLineNum);
+                return channel ?? FindConnectedChannel(connectedLineNum);
             }
             catch (IndexOutOfRangeException)
             {
@@ -69,6 +65,7 @@ namespace AsteriskManager
         }
 
         private AutoResetEvent Calls = new AutoResetEvent(true);
+
         private DialData RemoveActiveCall(DialData dial)
         {
             try
@@ -106,7 +103,7 @@ namespace AsteriskManager
         /// </summary>
         /// <param name="channel">Канал</param>
         /// <returns>Информацию о зовнке</returns>
-        private DialData FindDialbyChannel(ChannelData channel)
+        private DialData FindDialByChannel(ChannelData channel)
         {
             try
             {
@@ -114,8 +111,8 @@ namespace AsteriskManager
                 for (int i = 0; i < ActiveCalls.Count; i++)
                 {
                     var channelId = channel.ChannelID;
-                    var isDestinationOrOrginateChannel = channelId == ActiveCalls[i].ChannelID || channelId == ActiveCalls[i].DestinationID;
-                    if (isDestinationOrOrginateChannel)
+                    var isDestinationOrOriginateChannel = channelId == ActiveCalls[i].ChannelID || channelId == ActiveCalls[i].DestinationID;
+                    if (isDestinationOrOriginateChannel)
                     {
                         return ActiveCalls[i];
                     }
@@ -124,7 +121,7 @@ namespace AsteriskManager
             }
             catch (IndexOutOfRangeException)
             {
-                return FindDialbyChannel(channel);
+                return FindDialByChannel(channel);
             }
             finally
             {
@@ -136,15 +133,15 @@ namespace AsteriskManager
         /// </summary>
         /// <param name="channelId">Канал</param>
         /// <returns>Информацию о зовнке</returns>
-        private DialData FindDialbyChannel(string channelId)
+        private DialData FindDialByChannel(string channelId)
         {
             try
             {
                 Calls.WaitOne();
                 for (int i = 0; i < ActiveCalls.Count; i++)
                 {
-                    var isDestinationOrOrginateChannel = channelId == ActiveCalls[i].ChannelID || channelId == ActiveCalls[i].DestinationID;
-                    if (isDestinationOrOrginateChannel && ActiveCalls[i].currentstatus == DialData.Dialstat.DialBegin && !string.IsNullOrEmpty(channelId))
+                    var isDestinationOrOriginateChannel = channelId == ActiveCalls[i].ChannelID || channelId == ActiveCalls[i].DestinationID;
+                    if (isDestinationOrOriginateChannel && ActiveCalls[i].currentstatus == DialData.Dialstat.DialBegin && !string.IsNullOrEmpty(channelId))
                     {
                         return ActiveCalls[i];
                     }
@@ -153,7 +150,7 @@ namespace AsteriskManager
             }
             catch (IndexOutOfRangeException)
             {
-                return FindDialbyChannel(channelId);
+                return FindDialByChannel(channelId);
             }
             finally
             {
@@ -191,13 +188,9 @@ namespace AsteriskManager
                 for (int i = 0; i < ActiveCalls.Count; i++)
                 {
                     DialData call = ActiveCalls[i];
-                    var channelId = call.ChannelID;
-                    if (dial.ChannelID == channelId)
-                    {
-                        call.DestinationID = dial.DestinationID;
-                        return;
-                    }
-                    else if (dial.DestinationID == channelId)
+                    var isDialedChannelId = dial.DestinationID == call.ChannelID || call.ChannelID == dial.ChannelID;
+
+                    if (isDialedChannelId)
                     {
                         call.ChannelID = dial.ChannelID;
                         call.DestinationID = dial.DestinationID;
@@ -233,7 +226,7 @@ namespace AsteriskManager
                 return;
             }
 
-            var dial = FindDialbyChannel(RemovedChannel);
+            var dial = FindDialByChannel(RemovedChannel);
             if (dial == null)
             {
                 return;
@@ -307,7 +300,7 @@ namespace AsteriskManager
                     if (chan != null)
                         new DialBeginEvent(chan, true);
                     Thread.Sleep(500);
-                    var dial = FindDialbyChannel(PrevChanState);
+                    var dial = FindDialByChannel(PrevChanState);
                     if (dial != null)
                     {
                         //var dial = UpdateDialCallerID(dail);
@@ -318,7 +311,7 @@ namespace AsteriskManager
                 ///Так как в ами версии 1.3 события приходят с другой периодичностью, то проверка состояния канала единственный выход для того, чтобы сгенеоировать событие начала разговора.
                 if ((PrevChanState.State == ChannelState.RemoteRinging /*|| PrevChanState.State == ChannelState.Ringing*/) && CurrChanState.ChannelState == "6")
                 {
-                    var dial = FindDialbyChannel(PrevChanState);
+                    var dial = FindDialByChannel(PrevChanState);
                     if (dial != null)
                     {
                         //var dial = UpdateDialCallerID(dail);
@@ -391,7 +384,7 @@ namespace AsteriskManager
                         {
                             if (e.dialinfo.DestinationID != null)
                             {
-                                var dial = FindDialbyChannel(e.dialinfo.DestinationID);
+                                var dial = FindDialByChannel(e.dialinfo.DestinationID);
                                 if (dial != null)
                                 {
                                     e.dialinfo = dial;
@@ -410,7 +403,7 @@ namespace AsteriskManager
                         {
                             if (!string.IsNullOrEmpty(e.dialinfo.DestinationID))
                             {
-                                var dial = FindDialbyChannel(e.dialinfo.DestinationID);
+                                var dial = FindDialByChannel(e.dialinfo.DestinationID);
                                 if (dial != null)
                                 {
                                     e.dialinfo = dial;
@@ -441,13 +434,11 @@ namespace AsteriskManager
         #region Переменные
         public enum AmiVersions { v11, v13, v25, v28, UNKNOWN }
         public event EventHandler Disconnecting;
-        public string SendLogPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\";
         public string RecvLogPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\B-Cti\\log\\";
-        public bool bLogEnabled = true;
+        public bool IsLogEnabled = true;
         public string SIPADDHEADER { get; set; }
         public AmiVersions AmiVersion { get; private set; }
         public string CallerID { get; set; }
-        private AmiLogger log = new AmiLogger();
         /// <summary>
         /// Информация о текущих активных звонках
         /// </summary>
@@ -461,10 +452,6 @@ namespace AsteriskManager
         /// Данные хранятся в виде: Ключ - ActionID, Данные - Типизированный класс данного ответа
         /// </summary>
         public static Dictionary<string, EventManager> ActionIdMessages = new Dictionary<string, EventManager>();
-        /// <summary>
-        /// Класс для подключения к серверу
-        /// </summary>
-        private SocketConnection ManagerConnect;
         /// <summary>
         /// Данные пользователя за которым происходит слежение
         /// </summary>
@@ -480,19 +467,25 @@ namespace AsteriskManager
         /// (Бесполезная переменная)
         /// </summary>
         public string UsersAmount { get; set; }
+        private AmiLogger logger = new AmiLogger();
+        /// <summary>
+        /// Класс для подключения к серверу
+        /// </summary>
+        private SocketConnection connectionManager;
         /// <summary>
         /// Итератор для ActionID
         /// </summary>
-        private int actionIdcount = 0;
+        private int actionIdcounter = 0;
         /// <summary>
         /// Указатель на поток с пингом
         /// </summary>
-        Thread Parser;
-        Thread ping;
-        Thread reciever;
-        BackgroundWorker pinger;
-        BackgroundWorker parser;
-        BackgroundWorker Reciever;
+        private Thread parserThread;
+        private Thread pingThread;
+        private Thread recieverThread;
+        private BackgroundWorker pingerWorker;
+        private BackgroundWorker parserWorker;
+        private BackgroundWorker recieverWorker;
+        private AutoResetEvent sendPingEvent = new AutoResetEvent(false);
         /// <summary>
         /// Переменная необходимая для грамотного выхода из библиотеки
         /// В случае если некоторые потоки, еще работают, а мы завершили рабту в библиотекой помешает вылету имключений
@@ -502,7 +495,6 @@ namespace AsteriskManager
         /// <summary>
         /// Семафор для пинга
         /// </summary>
-        private AutoResetEvent SendPing = new AutoResetEvent(false);
         #endregion
 
         #region Конструкторы
@@ -512,13 +504,13 @@ namespace AsteriskManager
         /// </summary>
         public AMIManager()
         {
-            ManagerConnect = new SocketConnection();
+            connectionManager = new SocketConnection();
             CreateLogFoldersIfNeeded();
         }
 
         private void CreateLogFoldersIfNeeded()
         {
-            if (!bLogEnabled)
+            if (!IsLogEnabled)
             {
                 return;
             }
@@ -553,7 +545,7 @@ namespace AsteriskManager
         public AMIManager(ClientsData client)
         {
             UserData = client;
-            ManagerConnect = new SocketConnection();
+            connectionManager = new SocketConnection();
             CreateLogFoldersIfNeeded();
         }
         /// <summary>
@@ -567,7 +559,7 @@ namespace AsteriskManager
         public AMIManager(ClientsData client, string login, string pwd, string ip, int port)
         {
             UserData = client;
-            ManagerConnect = new SocketConnection();
+            connectionManager = new SocketConnection();
             Connect(login, pwd, ip, port);
             CreateLogFoldersIfNeeded();
         }
@@ -577,7 +569,7 @@ namespace AsteriskManager
         /// <param name="socket"></param>
         public AMIManager(TcpClient socket)
         {
-            ManagerConnect = new SocketConnection(socket);
+            connectionManager = new SocketConnection(socket);
             CreateLogFoldersIfNeeded();
         }
         #endregion
@@ -589,8 +581,8 @@ namespace AsteriskManager
         /// <returns>Возвращает новый номер счетчика</returns>
         private string CreateActionID()
         {
-            actionIdcount++;
-            return Helper.MachineID + actionIdcount.ToString();
+            actionIdcounter++;
+            return Helper.MachineID + actionIdcounter.ToString();
         }
 
         /// <summary>
@@ -598,14 +590,43 @@ namespace AsteriskManager
         /// </summary>
         /// <param name="action">Класс действия</param>
         /// <returns>Успена ли отправка</returns>
-        private void SendToAsterisk(ActionManager action)
+        private void SendToAsterisk(ISerializableAmiAction action)
         {
-            var message = Helper.BuildAction(action, null, false);
-            if (bLogEnabled)
-                log.WriteLog(message);
+            var messageBuilder = new AmiActionMesasgeBuilder(action);
+            var fields = action.GetFields();
+            var message = messageBuilder.AddFields(fields).Build();
+
+#if LOG
+            try
+            {
+                DateTime date = DateTime.Now;
+                System.IO.StreamWriter file = new System.IO.StreamWriter("AMILOG" + date.ToShortDateString() + ".log", true);
+                try
+                {
+                    file.WriteLine(date.ToString(), file.NewLine);
+                    file.WriteLine(message);
+                    file.Close();
+                }
+                finally
+                {
+                    if (file != null)
+                        file.Dispose();
+                }
+            }
+            catch (StackOverflowException)
+            {
+            }
+#endif
+
+            if (IsLogEnabled)
+            {
+                logger.WriteLog(message);
+            }
+
+
             byte[] sendBuffer = Encoding.ASCII.GetBytes(message);
 
-            if (ManagerConnect == null || !ManagerConnect.IsSockConnected())
+            if (connectionManager == null || !connectionManager.IsSockConnected())
             {
                 if (!IsAlive)
                 {
@@ -617,7 +638,7 @@ namespace AsteriskManager
                     Disconnecting(this, null);
                 }
 
-                log.WriteLog("##Disconnectiong null or socknotconnected 1059");
+                logger.WriteLog("##Disconnectiong null or socknotconnected 1059");
                 Abort();
 
                 return;
@@ -625,18 +646,16 @@ namespace AsteriskManager
 
             try
             {
-                ManagerConnect.Socket.Send(sendBuffer);
+                connectionManager.Socket.Send(sendBuffer);
             }
             catch (SocketException e)
             {
                 //Console.WriteLine(e.Message);
                 if (e.SocketErrorCode == SocketError.TimedOut && IsConnected)
                 {
-                    if (Disconnecting != null)
-                    {
-                        Disconnecting(this, null);
-                    }
-                    log.WriteLog("##Disconnectiong socketexceps timeout 1033");
+                    Disconnecting?.Invoke(this, null);
+
+                    logger.WriteLog("##Disconnectiong socketexceps timeout 1033");
                     Abort();
                     return;
                 }
@@ -649,12 +668,9 @@ namespace AsteriskManager
                     return;
                 }
 
-                if (Disconnecting != null)
-                {
-                    Disconnecting(this, null);
-                }
+                Disconnecting?.Invoke(this, null);
 
-                log.WriteLog("##Disconnectiong disposed 1047");
+                logger.WriteLog("##Disconnectiong disposed 1047");
                 Abort();
                 return;
             }
@@ -662,47 +678,43 @@ namespace AsteriskManager
         private void PingWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            while (worker.CancellationPending != true && ManagerConnect != null && ManagerConnect.IsSockConnected())
+            while (worker.CancellationPending != true && connectionManager != null && connectionManager.IsSockConnected())
             {
                 try
                 {
                     ///Каждые 6 секунд, если нет ответа от сервера отправлять пингe
 
-                    if (SendPing.WaitOne(2000))
+                    if (sendPingEvent.WaitOne(2000))
                     {
                         continue;
                     }
 
-                    if (worker.CancellationPending == true)
+                    if (worker.CancellationPending == true || e.Cancel == true)
                     {
                         e.Cancel = true;
-
-                        if (e.Cancel == true)
-                        {
-                            return;
-                        }
+                        return;
                     }
                     Ping();
                     Thread.Sleep(100);
-                    SendPing.Reset();
+                    sendPingEvent.Reset();
 
                 }
                 catch (AmiTimeOutException)
                 {
-                    pinger.CancelAsync();
-                    pinger.Dispose();
+                    pingerWorker.CancelAsync();
+                    pingerWorker.Dispose();
                 }
                 catch (AmiException)
                 {
-                    if (!ManagerConnect.IsSockConnected())
+                    if (!connectionManager.IsSockConnected())
                     {
-                        pinger.CancelAsync();
-                        pinger.Dispose();
+                        pingerWorker.CancelAsync();
+                        pingerWorker.Dispose();
                     }
                 }
                 catch (NullReferenceException)
                 {
-                    if (ManagerConnect == null && IsAlive)
+                    if (connectionManager == null && IsAlive)
                         throw new AmiException("ManagerConnect не создан");
                 }
             }
@@ -710,7 +722,7 @@ namespace AsteriskManager
         private void ParserWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            while (ManagerConnect != null && ManagerConnect.IsSockConnected())
+            while (connectionManager != null && connectionManager.IsSockConnected())
             {
                 if (worker.CancellationPending == true)
                 {
@@ -727,24 +739,15 @@ namespace AsteriskManager
         {
             InstantiateWorkersOnce();
 
-            StartAsyncCancellationWorker(Reciever, Reciever_DoWork, "Поток приема сообщений уже запущен. Переинициализируйте библиотеку");
-            StartAsyncCancellationWorker(pinger, PingWork, "Поток приема сообщений уже запущен. Переинициализируйте библиотеку");
-            StartAsyncCancellationWorker(parser, ParserWork, "Поток приема сообщений уже запущен. Переинициализируйте библиотеку");
+            StartAsyncCancellationWorker(recieverWorker, Reciever_DoWork, "Поток приема сообщений уже запущен. Переинициализируйте библиотеку");
+            StartAsyncCancellationWorker(pingerWorker, PingWork, "Поток приема сообщений уже запущен. Переинициализируйте библиотеку");
+            StartAsyncCancellationWorker(parserWorker, ParserWork, "Поток приема сообщений уже запущен. Переинициализируйте библиотеку");
         }
         private void InstantiateWorkersOnce()
         {
-            if (Reciever == null)
-            {
-                Reciever = new BackgroundWorker();
-            }
-            if (pinger == null)
-            {
-                pinger = new BackgroundWorker();
-            }
-            if (parser == null)
-            {
-                parser = new BackgroundWorker();
-            }
+            recieverWorker ??= new BackgroundWorker();
+            pingerWorker ??= new BackgroundWorker();
+            parserWorker ??= new BackgroundWorker();
         }
 
         private void StartAsyncCancellationWorker(BackgroundWorker worker, DoWorkEventHandler workEventHandler, string busyExceptionMessage)
@@ -763,49 +766,49 @@ namespace AsteriskManager
         private void StartThreads()
         {
             //Создаем новый поток для пинга
-            ping = new Thread(() =>
+            pingThread = new Thread(() =>
             {
                 //Thread.CurrentThread.IsBackground = true;
-                while (ManagerConnect.IsSockConnected())
+                while (connectionManager.IsSockConnected())
                 {
                     try
                     {
                         ///Каждые 6 секунд, если нет ответа от сервера отправлять пинг
-                        if (!SendPing.WaitOne(6000))
+                        if (!sendPingEvent.WaitOne(6000))
                         {
                             Ping();
                             Thread.Sleep(100);
-                            SendPing.Reset();
+                            sendPingEvent.Reset();
                         }
 
                     }
                     catch (AmiTimeOutException)
                     {
-                        ping.Join();
+                        pingThread.Join();
                     }
                     catch (AmiException)
                     {
-                        if (ManagerConnect.IsSockConnected())
+                        if (connectionManager.IsSockConnected())
                         {
                             continue;
                         }
 
-                        ping.Join();
+                        pingThread.Join();
                     }
                 }
             });
-            ping.Start();
+            pingThread.Start();
             //Как вариант записать здесь проверку на пинг, чтобы не создавать для нее новый поток
-            Parser = new Thread(() =>
+            parserThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                while (ManagerConnect.IsSockConnected())
+                while (connectionManager.IsSockConnected())
                 {
                     AsterParser.ParseServerMessage();
                 }
 
             });
-            Parser.Start();
+            parserThread.Start();
         }
         private void Reciever_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -826,7 +829,7 @@ namespace AsteriskManager
                         return;
                     }
 
-                    buffersize = ManagerConnect.Socket.Receive(recvBuffer);
+                    buffersize = connectionManager.Socket.Receive(recvBuffer);
                     //Перекодируем его к строковому типу
                     Response += Encoding.ASCII.GetString(recvBuffer, 0, buffersize);
                     if (!Response.EndsWith(Helper.LINE_SEPARATOR + Helper.LINE_SEPARATOR))
@@ -840,9 +843,9 @@ namespace AsteriskManager
                         return;
                     }
 #if LOG
-                    if (bLogEnabled)
+                    if (IsLogEnabled)
                     {
-                        log.WriteLog(Response);
+                        logger.WriteLog(Response);
 
                     }
 #endif
@@ -850,15 +853,15 @@ namespace AsteriskManager
                     AsterParser.Response = Response;
                     //Разрешаем ему доступ к данным
                     AsterParser.startParse.Set();
-                    SendPing.Set();
+                    sendPingEvent.Set();
                     //Обнуляем строку
                     Response = string.Empty;
                 }
-                while (ManagerConnect != null || ManagerConnect.IsSockConnected());
+                while (connectionManager != null || connectionManager.IsSockConnected());
             }
             catch (SocketException ex)
             {
-                if (ex.SocketErrorCode == SocketError.TimedOut && ManagerConnect != null && ManagerConnect.IsSockConnected() && !ManagerConnect.IsSockConnected())
+                if (ex.SocketErrorCode == SocketError.TimedOut && connectionManager != null && connectionManager.IsSockConnected() && !connectionManager.IsSockConnected())
                 {
                     throw new AmiTimeOutException("Слишком долгое время ожидания ответа от сервера");
                 }
@@ -907,7 +910,7 @@ namespace AsteriskManager
                     //5 милисекунд слипа, работает и без него. Но мне так спокойнее.
                     //Нужен для того, чтобы буфер заполнился
                     Thread.Sleep(10);
-                    buffersize = ManagerConnect.Socket.Receive(recvBuffer);
+                    buffersize = connectionManager.Socket.Receive(recvBuffer);
                     //Перекодируем его к строковому типу
                     Response += Encoding.ASCII.GetString(recvBuffer, 0, buffersize);
                     if (!Response.EndsWith(Helper.LINE_SEPARATOR + Helper.LINE_SEPARATOR))
@@ -935,23 +938,23 @@ namespace AsteriskManager
                     AsterParser.Response = Response;
                     //Разрешаем ему доступ к данным
                     AsterParser.startParse.Set();
-                    SendPing.Set();
+                    sendPingEvent.Set();
                     //Обнуляем строку
                     Response = string.Empty;
                 }
-                while (ManagerConnect != null || ManagerConnect.IsSockConnected());
+                while (connectionManager != null || connectionManager.IsSockConnected());
             }
             catch (SocketException e)
             {
-                if (e.SocketErrorCode != SocketError.TimedOut || ManagerConnect == null || !ManagerConnect.IsSockConnected())
+                if (e.SocketErrorCode != SocketError.TimedOut || connectionManager == null || !connectionManager.IsSockConnected())
                 {
                     return;
                 }
 
-                SendPing.Set();
+                sendPingEvent.Set();
                 Thread.Sleep(3000);
 
-                if (ManagerConnect.IsSockConnected() || !IsConnected)
+                if (connectionManager.IsSockConnected() || !IsConnected)
                 {
                     return;
                 }
@@ -961,7 +964,7 @@ namespace AsteriskManager
                     Disconnecting(this, null);
                 }
 
-                log.WriteLog("##Disconnectiong socketexceps 1377");
+                logger.WriteLog("##Disconnectiong socketexceps 1377");
                 Abort();
             }
             catch (ObjectDisposedException e)
@@ -977,7 +980,7 @@ namespace AsteriskManager
                     Disconnecting(this, null);
                 }
 
-                log.WriteLog("##Disconnectiong Objectdisposed 1395");
+                logger.WriteLog("##Disconnectiong Objectdisposed 1395");
                 Abort();
             }
             catch (NullReferenceException)
@@ -991,7 +994,7 @@ namespace AsteriskManager
                 {
                     Disconnecting(this, null);
                 }
-                log.WriteLog("##Disconnectiong nullreference 1410");
+                logger.WriteLog("##Disconnectiong nullreference 1410");
                 Abort();
             }
 
@@ -1002,8 +1005,8 @@ namespace AsteriskManager
         /// <returns></returns>
         private void StartRecieve()
         {
-            reciever = new Thread(() => RecieveFromAsterisk());
-            reciever.Start();
+            recieverThread = new Thread(() => RecieveFromAsterisk());
+            recieverThread.Start();
             ///Инициализация Пинга и Парсера
             StartThreads();
         }
@@ -1032,8 +1035,8 @@ namespace AsteriskManager
             UsersAmount = null;
             ActionIdMessages.Clear();
             ParkedCalls.Clear();
-            ManagerConnect = null;
-            actionIdcount = 0;
+            connectionManager = null;
+            actionIdcounter = 0;
         }
         #endregion
 
@@ -1055,14 +1058,14 @@ namespace AsteriskManager
         {
 
             ////Вариант со старыми сокетами
-            if (ManagerConnect == null)
+            if (connectionManager == null)
             {
-                ManagerConnect = new SocketConnection();
+                connectionManager = new SocketConnection();
             }
 
             try
             {
-                ManagerConnect.Socket.Connect(ManagerConnect.getEndPoint(ip, port));
+                connectionManager.Socket.Connect(connectionManager.getEndPoint(ip, port));
             }
             catch (SocketException e)
             {
@@ -1071,9 +1074,12 @@ namespace AsteriskManager
                 return false;
             }
             //Создаем дейстиве логин
-            LoginAction action = new LoginAction(login, pwd);
-            //Создаем ActionId для запроса
-            action.ActionID = CreateActionID();
+            LoginAction action = new LoginAction(CreateActionID())
+            {
+                UserName = login,
+                PassWord = pwd
+            };
+
             //Отправляем запрос
             SendToAsterisk(action);
             //Начинаем асинхронный прием сообщений
@@ -1081,13 +1087,13 @@ namespace AsteriskManager
 
             if (LoginEvent.LoginComplete.WaitOne(5000))
             {
-                if (ActionIdMessages.ContainsKey(action.ActionID))
+                if (ActionIdMessages.ContainsKey(action.GetActionId()))
                 {
                     IsAlive = true;
-                    var result = (LoginEvent)ActionIdMessages[action.ActionID];
+                    var result = (LoginEvent)ActionIdMessages[action.GetActionId()];
                     ParseAndSetAmiVersion(result.Version);
 
-                    ActionIdMessages.Remove(action.ActionID);
+                    ActionIdMessages.Remove(action.GetActionId());
                     IsConnected = result.IsConnected;
                     return IsConnected;
                 }
@@ -1120,33 +1126,14 @@ namespace AsteriskManager
             }
         }
 
-        private string CalculateMD5Hash(string input)
-        {
-            // step 1, calculate MD5 hash from input
-            MD5 md5 = System.Security.Cryptography.MD5.Create();
-            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-            byte[] hash = md5.ComputeHash(inputBytes);
-            // step 2, convert byte array to hex string
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("x2"));
-            }
-            return sb.ToString();
-        }
-
         public bool ConnectMD5(string login, string pwd, string ip, int port)
         {
 
-            ////Вариант со старыми сокетами
-            if (ManagerConnect == null)
-            {
-                ManagerConnect = new SocketConnection();
-            }
+            connectionManager ??= new SocketConnection();
 
             try
             {
-                ManagerConnect.Socket.Connect(ManagerConnect.getEndPoint(ip, port));
+                connectionManager.Socket.Connect(connectionManager.getEndPoint(ip, port));
             }
             catch (SocketException e)
             {
@@ -1168,8 +1155,8 @@ namespace AsteriskManager
                 //return false;
             }
             //Создаем дейстиве логин
-            ChallengeAction challenge = new ChallengeAction();
-            challenge.ActionID = CreateActionID();
+            ChallengeAction challenge = new ChallengeAction(CreateActionID());
+
             SendToAsterisk(challenge);
             string key = string.Empty;
             //Начинаем асинхронный прием сообщений
@@ -1179,24 +1166,24 @@ namespace AsteriskManager
             {
                 return false;
             }
-            else if (ActionIdMessages.ContainsKey(challenge.ActionID))
+            else if (ActionIdMessages.ContainsKey(challenge.GetActionId()))
             {
-                var result = (ChallengeEvent)ActionIdMessages[challenge.ActionID];
-                key = CalculateMD5Hash(result.Challenge + pwd);
+                var result = (ChallengeEvent)ActionIdMessages[challenge.GetActionId()];
+                key = AsteriskManagerUtils.CalculateMD5Hash(result.Challenge + pwd);
+
                 ParseAndSetAmiVersion(result.Version);
 
                 //AmiVersion = result.Version;
-                ActionIdMessages.Remove(challenge.ActionID);
+                ActionIdMessages.Remove(challenge.GetActionId());
             }
 
-            LoginAction action = new LoginAction();
-            action._UserName = login;
-            action._AuthType = "MD5";
-            action._Key = key;
+            LoginAction action = new LoginAction(CreateActionID())
+            {
+                UserName = login,
+                AuthType = "MD5",
+                Key = key
+            };
 
-            //Создаем ActionId для запроса
-            action.ActionID = CreateActionID();
-            //Отправляем запрос
             SendToAsterisk(action);
 
             //if (reciever == null || reciever.IsAlive == false)
@@ -1204,11 +1191,11 @@ namespace AsteriskManager
             //else throw new AmiException("Поток приема сообщений уже запущен!!!!");
             if (LoginEvent.LoginComplete.WaitOne(5000))
             {
-                if (ActionIdMessages.ContainsKey(action.ActionID))
+                if (ActionIdMessages.ContainsKey(action.GetActionId()))
                 {
                     IsAlive = true;
-                    var result = (LoginEvent)ActionIdMessages[action.ActionID];
-                    ActionIdMessages.Remove(action.ActionID);
+                    var result = (LoginEvent)ActionIdMessages[action.GetActionId()];
+                    ActionIdMessages.Remove(action.GetActionId());
                     IsConnected = result.IsConnected;
                     return IsConnected;
                 }
@@ -1280,45 +1267,45 @@ namespace AsteriskManager
 
         private void CloseSocket()
         {
-            if (ManagerConnect != null && ManagerConnect.Socket != null)
+            if (connectionManager != null && connectionManager.Socket != null)
             {
-                ManagerConnect.CloseSocket();
+                connectionManager.CloseSocket();
             }
         }
 
         private void DisposeWorkers()
         {
-            if (Reciever == null || parser == null || pinger == null)
+            if (recieverWorker == null || parserWorker == null || pingerWorker == null)
             {
                 return;
             }
 
-            pinger.Dispose();
-            parser.Dispose();
-            Reciever.Dispose();
+            pingerWorker.Dispose();
+            parserWorker.Dispose();
+            recieverWorker.Dispose();
 
-            pinger = null;
-            parser = null;
-            Reciever = null;
+            pingerWorker = null;
+            parserWorker = null;
+            recieverWorker = null;
         }
 
         private void StopWorkers()
         {
-            if (Reciever != null && Reciever.IsBusy)
+            if (recieverWorker != null && recieverWorker.IsBusy)
             {
-                Reciever.CancelAsync();
+                recieverWorker.CancelAsync();
             }
 
-            if (parser != null && parser.IsBusy)
+            if (parserWorker != null && parserWorker.IsBusy)
             {
-                parser.CancelAsync();
+                parserWorker.CancelAsync();
                 AsterParser.startParse.Set();
             }
 
-            if (pinger != null && pinger.IsBusy)
+            if (pingerWorker != null && pingerWorker.IsBusy)
             {
-                pinger.CancelAsync();
-                SendPing.Set();
+                pingerWorker.CancelAsync();
+                sendPingEvent.Set();
             }
         }
 
@@ -1335,15 +1322,15 @@ namespace AsteriskManager
                 ServerUsers.Clear();
             }
 
-            SippeersAction action = new SippeersAction();
-            action.ActionID = CreateActionID();
+            SippeersAction action = new SippeersAction(CreateActionID());
             SendToAsterisk(action);
+
             if (PeerlistCompleteEvent.PeerlistComplete.WaitOne(25000))
             {
-                if (ActionIdMessages.ContainsKey(action.ActionID))
+                if (ActionIdMessages.ContainsKey(action.GetActionId()))
                 {
-                    var message = (PeerlistCompleteEvent)ActionIdMessages[action.ActionID];
-                    ActionIdMessages.Remove(action.ActionID);
+                    var message = (PeerlistCompleteEvent)ActionIdMessages[action.GetActionId()];
+                    ActionIdMessages.Remove(action.GetActionId());
 
                     return message.ListItems;
                 }
@@ -1357,8 +1344,10 @@ namespace AsteriskManager
         public ClientsData GetUserData(string number)
         {
             ///Отправка запроса на сервер
-            SIPShowPeerAction action = new SIPShowPeerAction(number);
-            action.ActionID = CreateActionID();
+            SIPShowPeerAction action = new SIPShowPeerAction(CreateActionID())
+            {
+                Peer = number
+            };
             SendToAsterisk(action);
 
             ///Ожидание ответа в течении 5 секунд
@@ -1368,12 +1357,12 @@ namespace AsteriskManager
             }
 
             ///Если в общей памяти содержится сообщение с нашим ключом, то получаем данные
-            if (!ActionIdMessages.ContainsKey(action.ActionID))
+            if (!ActionIdMessages.ContainsKey(action.GetActionId()))
             {
                 return null;
             }
 
-            var message = (SIPShowPeerEvent)ActionIdMessages[action.ActionID];
+            var message = (SIPShowPeerEvent)ActionIdMessages[action.GetActionId()];
             ClientsData client = new ClientsData()
             {
                 Number = number,
@@ -1385,7 +1374,7 @@ namespace AsteriskManager
                 Protocol = message.Status
             };
 
-            ActionIdMessages.Remove(action.ActionID);
+            ActionIdMessages.Remove(action.GetActionId());
 
             for (int i = 0; i < ServerUsers.Count; i++)
             {
@@ -1408,8 +1397,11 @@ namespace AsteriskManager
         /// <returns></returns>
         private bool GetActiveChannelsInfo()
         {
-            CommandAction action = new CommandAction("Core Show Channels");
-            action.ActionID = CreateActionID();
+            CommandAction action = new CommandAction(CreateActionID())
+            {
+                Command = "Core Show Channels"
+            };
+
             SendToAsterisk(action);
 
             if (!CoreShowChannelsEvent.CoreShowChannelsComplete.WaitOne(5000))
@@ -1419,15 +1411,17 @@ namespace AsteriskManager
 
             foreach (var obj in activeChannels.GetChannels())
             {
-                StatusAction status = new StatusAction(obj.ChannelID);
-                status.ActionID = CreateActionID();
+                StatusAction status = new StatusAction(CreateActionID())
+                {
+                    Channel = obj.ChannelID
+                };
                 SendToAsterisk(status);
 
                 if (StatusEvent.StatusComplete.WaitOne(2000))
                 {
-                    if (ActionIdMessages.ContainsKey(status.ActionID))
+                    if (ActionIdMessages.ContainsKey(status.GetActionId()))
                     {
-                        ActionIdMessages.Remove(status.ActionID);
+                        ActionIdMessages.Remove(status.GetActionId());
                     }
                 }
             }
@@ -1439,17 +1433,17 @@ namespace AsteriskManager
         /// </summary>
         /// <param name="Number"></param>
         /// <returns>Вовзращает удалось ли добавить звонок в очередь</returns>
-        public bool ASyncCall(string Number)
+        public bool AsyncCall(string Number)
         {
             OriginateEvent.OriginateComplete.Reset();
             OriginateAction action = GetOriginateAction(Number, Number);
 
             if (OriginateEvent.OriginateComplete.WaitOne(5000))
             {
-                if (ActionIdMessages.ContainsKey(action.ActionID))
+                if (ActionIdMessages.ContainsKey(action.GetActionId()))
                 {
-                    var result = (OriginateEvent)ActionIdMessages[action.ActionID];
-                    ActionIdMessages.Remove(action.ActionID);
+                    var result = (OriginateEvent)ActionIdMessages[action.GetActionId()];
+                    ActionIdMessages.Remove(action.GetActionId());
                     return result.IsCallSuccess;
                 }
             }
@@ -1461,7 +1455,7 @@ namespace AsteriskManager
             return Call(SecondNumber ? client.SecondNumber : client.Number, client.Name);
         }
 
-        public bool Call(string NumberToCall, string name)
+        public bool Call(string NumberToCall, string name = null)
         {
             if (activeChannels.IsUserStartedCall(UserData.Number))
             {
@@ -1474,10 +1468,10 @@ namespace AsteriskManager
             SendToAsterisk(action);
             if (OriginateEvent.OriginateComplete.WaitOne(5000))
             {
-                if (ActionIdMessages.ContainsKey(action.ActionID))
+                if (ActionIdMessages.ContainsKey(action.GetActionId()))
                 {
-                    var result = (OriginateEvent)ActionIdMessages[action.ActionID];
-                    ActionIdMessages.Remove(action.ActionID);
+                    var result = (OriginateEvent)ActionIdMessages[action.GetActionId()];
+                    ActionIdMessages.Remove(action.GetActionId());
                     return result.IsCallSuccess;
                 }
             }
@@ -1488,10 +1482,9 @@ namespace AsteriskManager
 
         private OriginateAction GetOriginateAction(string number, string name)
         {
-            OriginateAction action = new OriginateAction(UserData, number, 1);
 
             var callerIdBuilder = new StringBuilder();
-            callerIdBuilder.Append(string.IsNullOrEmpty(name) ? CallerID : Helper.ConvertToTranslit(name));
+            callerIdBuilder.Append(string.IsNullOrEmpty(name) ? CallerID : AsteriskManagerUtils.ConvertToTranslit(name));
             callerIdBuilder.Append(" ");
             callerIdBuilder.Append(number);
             callerIdBuilder.Append(CallerID);
@@ -1499,9 +1492,16 @@ namespace AsteriskManager
             callerIdBuilder.Append(UserData.Number);
             callerIdBuilder.Append(">");
 
-            action.CallerId = callerIdBuilder.ToString();
-            action.Async = "true";
-            action.ActionID = CreateActionID();
+            OriginateAction action = new OriginateAction(CreateActionID(), OriginateEventСallType.SipToExten)
+            {
+                Exten = number,
+                Priority = 1,
+                Channel = UserData.GetChannel(),
+                Context = UserData.Context,
+                IsAsync = true,
+                CallerId = callerIdBuilder.ToString()
+            };
+
 
             return action;
         }
@@ -1576,7 +1576,11 @@ namespace AsteriskManager
 
         private void InvokeHangup(string channelId)
         {
-            HangupAction hangup = new HangupAction(channelId);
+            HangupAction hangup = new HangupAction(CreateActionID())
+            {
+                Channel = channelId
+            };
+
             SendToAsterisk(hangup);
         }
         /// <summary>
@@ -1606,34 +1610,39 @@ namespace AsteriskManager
         public bool Redirect(string NumberTransferTo, string TransferToNumber)
         {
             var channel = FindChannel(NumberTransferTo);
-            if (channel != null)
+            if (channel == null)
             {
-
-                //Работает на версии 1.3 и 2.8
-                if (string.IsNullOrEmpty(channel.Context))
-                {
-                    var channel2 = FindChannel(channel.ConnectedLineNum);
-                    if (channel2 != null)
-                    {
-                        InvokeRedirect(channel.ChannelID, channel2.Context, TransferToNumber);
-                        return true;
-                    }
-                }
-                else
-                {
-                    InvokeRedirect(channel.ChannelID, channel.Context, TransferToNumber);
-                    return true;
-                }
-
+                return false;
             }
 
-            return false;
+            //Работает на версии 1.3 и 2.8
+            if (!string.IsNullOrEmpty(channel.Context))
+            {
+                InvokeRedirect(channel.ChannelID, channel.Context, TransferToNumber);
+                return true;
+            }
+
+
+            var channel2 = FindChannel(channel.ConnectedLineNum);
+            if (channel2 == null)
+            {
+                return false;
+            }
+
+            InvokeRedirect(channel.ChannelID, channel2.Context, TransferToNumber);
+            return true;
         }
 
 
         private void InvokeRedirect(string channeld, string context, string transferToNumber)
         {
-            RedirectAction redirect = new RedirectAction(channeld, context, transferToNumber, 1);
+            RedirectAction redirect = new RedirectAction()
+            {
+                Channel = channeld,
+                Context = context,
+                Exten = transferToNumber,
+                Priority = 1
+            };
             SendToAsterisk(redirect);
 
         }
@@ -1647,27 +1656,30 @@ namespace AsteriskManager
         {
             if (AmiVersion == AmiVersions.v11 || AmiVersion == AmiVersions.v13)
             {
-                if (dial.CallerIDNum == UserData.Number)
+                var isFollowedUserCaller = dial.CallerIDNum == UserData.Number;
+                var (channel1, channel2) = isFollowedUserCaller
+                    ? (dial.DestinationID, dial.ChannelID)
+                    : (dial.ChannelID, dial.DestinationID);
+                string _timeout = (Timeout * 1000).ToString();
+
+                ParkAction park = new ParkAction(CreateActionID())
                 {
-                    string _timeout = (Timeout * 1000).ToString();
-                    ParkAction park = new ParkAction(dial.DestinationID, dial.ChannelID, _timeout);
-                    SendToAsterisk(park);
-                }
-                else
-                {
-                    string _timeout = (Timeout * 1000).ToString();
-                    ParkAction park = new ParkAction(dial.ChannelID, dial.DestinationID, _timeout);
-                    SendToAsterisk(park);
-                }
+                    Channel1 = channel1,
+                    Channel2 = channel2,
+                    Timeout = _timeout
+                };
+                SendToAsterisk(park);
+
                 return true;
             }
             else if (AmiVersion == AmiVersions.v25 || AmiVersion == AmiVersions.v28)
             {
-                ParkAction park = new ParkAction(dial.DestinationID);
-                //var channel2 = FindConnectedChannel(ParkNumber);
-                park.ActionID = CreateActionID();
-                park.AnnounceChannel = dial.ChannelID;
-                //park.ParkingLot = UserData.number;
+                ParkAction park = new ParkAction(CreateActionID())
+                {
+                    Channel1 = dial.DestinationID,
+                    AnnounceChannel = dial.ChannelID
+                };
+
                 SendToAsterisk(park);
                 return true;
             }
@@ -1694,18 +1706,25 @@ namespace AsteriskManager
                 if (channel2 != null)
                 {
                     string _timeout = (Timeout * 1000).ToString();
-                    ParkAction park = new ParkAction(channel1.ChannelID, channel2.ChannelID, _timeout);
+                    ParkAction park = new ParkAction()
+                    {
+                        Channel1 = channel1.ChannelID,
+                        Channel2 = channel2.ChannelID,
+                        Timeout = _timeout
+                    };
                     SendToAsterisk(park);
                     return true;
                 }
             }
             else if (AmiVersion == AmiVersions.v25 || AmiVersion == AmiVersions.v28)
             {
-                ParkAction park = new ParkAction(channel1.ChannelID);
                 var channel2 = FindConnectedChannel(ParkNumber);
-                park.ActionID = "PARKOVKAWORKAU";
-                park.AnnounceChannel = channel2.ChannelID;
-                //park.ParkingLot = UserData.number;
+                ParkAction park = new ParkAction("PARKOVKAWORKAU")
+                {
+                    Channel1 = channel1.ChannelID,
+                    AnnounceChannel = channel2.ChannelID
+                };
+
                 SendToAsterisk(park);
                 return true;
             }
@@ -1790,13 +1809,18 @@ namespace AsteriskManager
 
         private bool OriginateChannelSpy(ClientsData User, string flag)
         {
-            var userChannel = UserData.getchannel();
+            var userChannel = UserData.GetChannel();
             return OriginateEventWithSipAddHeader(userChannel, "ChanSpy", userChannel + flag);
         }
 
         private bool OriginateEventWithSipAddHeader(string channel, string app, string data)
         {
-            OriginateAction originate = new OriginateAction(channel, app, data);
+            OriginateAction originate = new OriginateAction(OriginateEventСallType.AppCommand)
+            {
+                Channel = channel,
+                Application = app,
+                Data = data,
+            };
             originate.Priority = 1;
 
             Dictionary<string, string> vars = new Dictionary<string, string>();
@@ -1843,7 +1867,7 @@ namespace AsteriskManager
         /// <returns>Если все прошло успешно, то на телефон пользователя поступит вызов с записью</returns>
         public bool AskForPlayback(string PathToPlayBackFile)
         {
-            return OriginateEventWithSipAddHeader(UserData.getchannel(), "Playback", PathToPlayBackFile);
+            return OriginateEventWithSipAddHeader(UserData.GetChannel(), "Playback", PathToPlayBackFile);
         }
         /// <summary>
         /// Функция ответа на звонок без поднятия трубки. (Работает не со всеми телефонами)
@@ -1860,7 +1884,7 @@ namespace AsteriskManager
 
             if (channel.State == ChannelState.RemoteRinging || (channel.State == ChannelState.Ringing && channel.ConnectedLineNum == UserData.Number))
             {
-                OriginateEventWithSipAddHeader(UserData.getchannel(), "PickupChan", channel.ChannelID);
+                OriginateEventWithSipAddHeader(UserData.GetChannel(), "PickupChan", channel.ChannelID);
             }
         }
         /// <summary>
@@ -1869,7 +1893,10 @@ namespace AsteriskManager
         /// <param name="ReloadModule"></param>
         public void Reload(string ReloadModule)
         {
-            ReloadAction reload = new ReloadAction(ReloadModule);
+            ReloadAction reload = new ReloadAction()
+            {
+                Module = ReloadModule
+            };
             SendToAsterisk(reload);
         }
         #endregion

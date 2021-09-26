@@ -1,60 +1,37 @@
-﻿using System.Text;
-///
+﻿using System.Collections.Generic;
+using AsteriskManager.Utils;
+
 namespace AsteriskManager.Manager.Actions
 {
     /// <summary>
     /// http://www.asteriskdocs.org/en/2nd_Edition/asterisk-book-html-chunk/asterisk-APP-F-24.html
     /// https://wiki.asterisk.org/wiki/display/AST/ManagerAction_Park
     /// </summary>
-    class ParkAction : ActionManager
+    class ParkAction : BaseAmiAction
     {
-        public ParkAction(string channel1)
+        const string ACTION_NAME = "Park";
+
+        public ParkAction() : base(ACTION_NAME)
         {
-            Channel1 = channel1;
-            //Channel2 = channel2;
-            //Timeout = timeout;
         }
-        public ParkAction(string channel1, string channel2, string timeout)
+
+        public ParkAction(string actionId) : base(actionId, ACTION_NAME)
         {
-            Channel1 = channel1;
-            Channel2 = channel2;
-            Timeout = timeout;
         }
-        public ParkAction(string channel1, string channel2, string timeout, string parkinglot)
+
+        public string Channel1;
+        public string Channel2;
+        public string AnnounceChannel;
+        public string Timeout;
+        public string ParkingLot;
+
+        public override Dictionary<string, object> GetFields() => AsteriskManagerUtils.OmitNullOrEmptyStrings(new()
         {
-            Channel1 = channel1;
-            Channel2 = channel2;
-            Timeout = timeout;
-            ParkingLot = parkinglot;
-        }
-        public override string Action
-        {
-            get
-            {
-                return "Park";
-            }
-        }
-        public string Channel1 { get; set; }
-        public string Channel2 { get; set; }
-        public string AnnounceChannel { get; set; }
-        public string Timeout { get; set; }
-        public string ParkingLot { get; set; }
-        public override string Parameters
-        {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.Append(string.Concat("Channel: ", Channel1, Helper.LINE_SEPARATOR));
-                if (!string.IsNullOrEmpty(Channel2))
-                    sb.Append(string.Concat("Channel2: ", Channel2, Helper.LINE_SEPARATOR));
-                if (!string.IsNullOrEmpty(Timeout))
-                    sb.Append(string.Concat("Timeout: ", Timeout, Helper.LINE_SEPARATOR));
-                if(!string.IsNullOrEmpty(AnnounceChannel))
-                    sb.Append(string.Concat("AnnounceChannel: ", AnnounceChannel, Helper.LINE_SEPARATOR));
-                if (!string.IsNullOrEmpty(ParkingLot))
-                    sb.Append(string.Concat("Parkinglot: ", ParkingLot, Helper.LINE_SEPARATOR));
-                return sb.ToString();
-            }
-        }
+            ["Channel"] = Channel1,
+            ["Channel2"] = Channel2,
+            ["Timeout"] = Timeout,
+            ["AnnounceChannel"] = AnnounceChannel,
+            ["Parkinglot"] = ParkingLot,
+        });
     }
 }

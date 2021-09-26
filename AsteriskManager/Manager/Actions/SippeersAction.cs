@@ -1,21 +1,13 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class SippeersAction : ActionManager
+    class SippeersAction : BaseAmiAction
     {
-        public override string Action
+        public SippeersAction(string actionId) : base(actionId, "Sippeers")
         {
-            get
-            {
-                return "Sippeers";
-            }
         }
 
-        public override string Parameters
-        {
-            get
-            {
-                return "";
-            }
-        }
+        public override Dictionary<string, object> GetFields() => new();
     }
 }

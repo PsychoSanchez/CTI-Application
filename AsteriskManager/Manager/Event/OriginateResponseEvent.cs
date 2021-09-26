@@ -13,10 +13,9 @@
 
         public OriginateResponseEvent(string message)
         {
-            if (Helper.GetParameterValue(message, "Response: ").Equals("Failure"))
-                Response = false;
-            else
-                Response = true;
+            var isFailed = Helper.GetParameterValue(message, "Response: ").Equals("Failure");
+            Response = !isFailed;
+
             Channel = Helper.GetParameterValue(message, "Channel: ");
             Context = Helper.GetParameterValue(message, "Context: ");
             Exten = Helper.GetParameterValue(message, "Exten: ");

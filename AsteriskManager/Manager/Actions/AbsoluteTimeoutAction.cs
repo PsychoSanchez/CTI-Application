@@ -1,4 +1,6 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
     /// <summary>
     ///     The AbsoluteTimeoutAction sets the absolute maximum amount of time permitted for a call on a given channel.<br />
@@ -9,72 +11,24 @@
     ///     you can playback an explanatory note to the calling party (the called party will not hear that).<br />
     ///     This action corresponds the the AbsoluteTimeout command used in the dialplan.
     /// </summary>
-    public class AbsoluteTimeoutAction : ActionManager
+    public class AbsoluteTimeoutAction : BaseAmiAction
     {
-        #region AbsoluteTimeoutAction()
-
-        /// <summary>
-        ///     Creates a new empty AbsoluteTimeoutAction.
-        /// </summary>
-        public AbsoluteTimeoutAction()
+        const string ACTION = "AbsoluteTimeout";
+        public AbsoluteTimeoutAction(string actionId) : base(actionId, ACTION)
         {
         }
 
-        #endregion
+        public string Channel;
+        // timeout in seconds or 0 to cancel the AbsoluteTimeout
+        public int Timeout;
 
-        #region AbsoluteTimeoutAction(channel, timeout)
-
-        /// <summary>
-        ///     Creates a new AbsoluteTimeoutAction with the given channel and timeout.
-        /// </summary>
-        /// <param name="channel">the name of the channel</param>
-        /// <param name="timeout">the timeout in seconds or 0 to cancel the AbsoluteTimeout</param>
-        public AbsoluteTimeoutAction(string channel, int timeout)
+        public override Dictionary<string, object> GetFields() => new()
         {
-            Channel = channel;
-            Timeout = timeout;
-        }
 
-        #endregion
-
-        #region Action
-
-        /// <summary>
-        ///     Get the name of this action, i.e. "AbsoluteTimeout".
-        /// </summary>
-        public override string Action
-        {
-            get { return "AbsoluteTimeout"; }
-        }
-
-        #endregion
-
-        #region Channel
-
-        /// <summary>
-        ///     Get/Set the name of the channel.
-        /// </summary>
-        public string Channel { get; set; }
-
-        #endregion
-
-        #region Timeout
-
-        /// <summary>
-        ///     Get/Set the timeout (in seconds) to set.
-        /// </summary>
-        public int Timeout { get; set; }
-
- 
-        public override string Parameters
-        {
-            get
-            {
-                ///Стек оверфлоу (Потому что поздно имплементить такие штуки)
-                return Helper.ToString(this);
-            }
-        }
-
-        #endregion
+            ["Channel"] =
+                Channel,
+            ["Timeout"] =
+                Timeout
+        };
     }
 }

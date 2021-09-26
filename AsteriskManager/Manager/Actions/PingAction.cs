@@ -1,21 +1,13 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class PingAction : ActionManager
+    class PingAction : BaseAmiAction
     {
-        public override string Action
+        public PingAction() : base("Ping")
         {
-            get
-            {
-                return "Ping";
-            }
         }
 
-        public override string Parameters
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public override Dictionary<string, object> GetFields() => new();
     }
 }

@@ -1,126 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace AsteriskManager.Parser
 {
-    class DataParser
+    class AMIParser
     {
-        /// <summary>
-        /// Поиск параметра в ответе из запроса. Пока не протестирую не пойму как она работает.
-        /// Так что пока оставлю так.
-        /// </summary>
-        /// <param name="asterInfo">Информация в строковой переменной</param>
-        /// <param name="matchfinder">Указатель на искомые данные</param>
-        public static string GetParameterValue(string asterInfo, string parameterName)
-        {
-            Regex matchExpression = new Regex(parameterName);
-            if (!matchExpression.Match(asterInfo).Success)
-                return null;
+        public const string LINE_SEPARATOR = "\r\n";
+        public const string KEY_VALUE_SEPARATOR = ":0";
 
-            string sentence = asterInfo.Substring(matchExpression.Match(asterInfo).Index + parameterName.Length);
-            int startIndex = sentence.IndexOf('\r');
-            if (startIndex == -1)
-                startIndex = sentence.IndexOf('\n');
-            if (startIndex == -1)
-                return null;
-
-            sentence = sentence.Remove(startIndex);
-            return sentence;
-        }
-        /// <summary>
-        /// Возвращает все данные по определенному параметру
-        /// </summary>
-        /// <param name="asterInfo">Информация в строковой переменной</param>
-        /// <param name="matchfinder">Указатель на искомые данные</param>
-        /// <param name="clientsdata">Извлечённые данные</param>
-        /// <param name="number">Число, определяющее количество извлекаемых символов</param>
-        public static List<string> GetDataByParam(string asterInfo, string matchfinder, int number)
+        public static string GetPropertyValue(string amiMessage, string propertyKey)
         {
-            List<string> clientsdata = new List<string>();
-            Regex matchExpression = new Regex(matchfinder);
-            foreach (Match match in matchExpression.Matches(asterInfo))
+            var keyWithSeparator = propertyKey + KEY_VALUE_SEPARATOR;
+            var propertyKeyIndex = amiMessage.IndexOf(keyWithSeparator);
+            if (propertyKeyIndex < 0)
             {
-                string data = asterInfo.Substring(match.Index).Remove(matchfinder.Length + number);
-                clientsdata.Add(data);
+                return string.Empty;
             }
-            return clientsdata;
-        }
-        /// <summary>
-        /// Извлечение данных из информации
-        /// </summary>
-        /// <param name="asterInfo">Информация в строковой переменной</param>
-        /// <param name="matchfinder"></param>
-        /// <param name="clientsdata"></param>
-        /// <param name="more"></param>
-        public static string FindInResponse(string asterInfo, string matchfinder/*, bool moreВот этот аргумент передается очень умным человеком, только для того, чтобы работала перегурзка. Браво!*/)
-        {
-            Regex matchExpression = new Regex(matchfinder);
-            if (!matchExpression.Match(asterInfo).Success)
-                return null;
 
-            string sentence = asterInfo.Substring(matchExpression.Match(asterInfo).Index + matchfinder.Length);
-            int startIndex = sentence.IndexOf('\n');
-            //2 решения
-            //sentence = sentence.Replace(System.Environment.NewLine, "");
-            //string removedBreaks = sentence.Replace("\r\n", "").Replace("\n", "").Replace("\r", "");
-            return sentence;
+            var valueStartIndex = propertyKeyIndex + keyWithSeparator.Length;
+            var endLineIndex = amiMessage.IndexOf(LINE_SEPARATOR, valueStartIndex);
+            var valueEndIndex = endLineIndex > -1 ? endLineIndex : amiMessage.Length;
+            var valueLength = valueEndIndex - valueStartIndex;
+
+            return amiMessage.Substring(valueStartIndex, valueLength);
         }
 
-        /// <summary>
-        /// Извлечение данных из информации
-        /// </summary>
-        /// <param name="asterInfo">Информация в строковой переменной</param>
-        /// <param name="matchfinder">Указатель на искомые данные</param>
-        /// <param name="clientsdata">Извлечённые данные</param>
-        /// <param name="listOfClients">Коллекция массивов строк для извлечённых данных</param>
-        public static string[] DataExtraction(string asterInfo, string matchfinder, string[] clientsdata)
+        public static Dictionary<string, string> ParseMessage(string amiMessage)
         {
-            int num = 0;
-            if (new Regex(matchfinder).Matches(asterInfo).Count == 0)
-                return null;
+            var parsedMessage = new Dictionary<string, string>();
 
-            foreach (Match match in new Regex(matchfinder).Matches(asterInfo))
+            if (!amiMessage.EndsWith(LINE_SEPARATOR))
             {
-                string sentence = asterInfo.Substring(match.Index + matchfinder.Length);
-                int startIndex = sentence.IndexOf('\r');
-                sentence = sentence.Remove(startIndex);
-                if (num == clientsdata.Length)
+                amiMessage += LINE_SEPARATOR;
+            }
+
+            var keyValuePairs = amiMessage.Split(LINE_SEPARATOR, StringSplitOptions.RemoveEmptyEntries);
+
+            //TODO: Test for /r/n at the end of the key value pairs
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                var indexOfSeparator = keyValuePair.IndexOf(KEY_VALUE_SEPARATOR);
+                if (indexOfSeparator < 0)
                 {
-                    break;
+                    continue;
                 }
-                clientsdata[num] = sentence;
-                num++;
+
+                var key = keyValuePair.Substring(0, indexOfSeparator + 1);
+                var value = keyValuePair.Substring(indexOfSeparator + LINE_SEPARATOR.Length);
+
+                if (!parsedMessage.TryAdd(key, value))
+                {
+                    // TODO: Log warning message
+                }
             }
 
-            return (string[])clientsdata.Clone();
-        }
-
-      
-
-        /// <summary>
-        /// Извлечение данных из иформации
-        /// </summary>
-        /// <param name="asterInfo">Строковая переменная, из которой извлекаются данные</param>
-        /// <param name="matchfinder">Совпадение, которое нужно отысказть</param>
-        /// <param name="clientsdata">Коллекция строк, в которую извлечены данные</param>
-        public static List<string> DataExtraction(string asterInfo, string matchfinder)
-        {
-            List<string> clientsdata = new List<string>();
-            Regex matchExpression = new Regex(matchfinder);
-            foreach (Match match in matchExpression.Matches(asterInfo))
-            {
-                string sentence = asterInfo.Substring(matchExpression.Match(asterInfo).Index + matchfinder.Length);
-                int startIndex = sentence.IndexOf('\n');
-                if (startIndex == -1)
-                    return null;
-
-                sentence = sentence.Remove(startIndex);
-                clientsdata.Add(sentence);
-            }
-            return clientsdata;
+            return parsedMessage;
         }
     }
 }

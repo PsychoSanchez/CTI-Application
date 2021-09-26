@@ -24,8 +24,6 @@ namespace AsteriskManager
         public string Uniqueid2 { get; set; }
         public string Dialstring { get; set; }
 
-        public DialData() { }
-
         public object Clone()
         {
             return this.MemberwiseClone();

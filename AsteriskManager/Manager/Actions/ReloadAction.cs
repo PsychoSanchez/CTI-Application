@@ -1,31 +1,18 @@
-﻿namespace AsteriskManager.Manager.Actions
-{
-    class ReloadAction : ActionManager
-    {
-        public override string Action
-        {
-            get
-            {
-                return "Reload";
-            }
-        }
-        public string Module { get; set; }
-        public ReloadAction()
-        {
+﻿using System.Collections.Generic;
+using AsteriskManager.Utils;
 
-        }
-        public ReloadAction(string Module)
+namespace AsteriskManager.Manager.Actions
+{
+    class ReloadAction : BaseAmiAction
+    {
+        public string Module;
+        public ReloadAction() : base("Reload")
         {
-            this.Module = Module;
         }
-        public override string Parameters
+
+        public override Dictionary<string, object> GetFields() => AsteriskManagerUtils.OmitNullOrEmptyStrings(new()
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(Module))
-                    return Module + Helper.LINE_SEPARATOR;
-                return string.Empty;
-            }
-        }
+            ["Module"] = Module
+        });
     }
 }

@@ -1,29 +1,19 @@
-﻿namespace AsteriskManager.Manager.Actions
+﻿using System.Collections.Generic;
+
+namespace AsteriskManager.Manager.Actions
 {
-    class ChallengeAction : ActionManager
+    class ChallengeAction : BaseAmiAction
     {
-        public string AuthType;
-        public ChallengeAction()
+        const string ACTION = "Challenge";
+
+        public ChallengeAction(string actionId) : base(actionId, ACTION)
         {
-            AuthType = "MD5";
-        }
-        public override string Action
-        {
-            get
-            {
-                return "Challenge";
-            }
         }
 
-        public override string Parameters
+        public string AuthType = "MD5";
+        public override Dictionary<string, object> GetFields() => new()
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(AuthType))
-                    return "AuthType: " + AuthType + Helper.LINE_SEPARATOR;
-                else
-                    return null;
-            }
-        }
+            ["AuthType"] = AuthType
+        };
     }
 }
